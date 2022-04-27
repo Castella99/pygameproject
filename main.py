@@ -2,7 +2,7 @@ import Yut
 import pygame
 
 yut = Yut.YutGame()
-while yut.start :
+while yut.start:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             yut.start = False
@@ -12,10 +12,10 @@ while yut.start :
                 yut.start = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             yut.start = False
-    yut.screen.blit(yut.background[0], (0,0))
+    yut.screen.blit(yut.background[0], (0, 0))
     pygame.display.update()
     
-while yut.running :
+while yut.running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             yut.running = False
