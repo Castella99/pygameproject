@@ -7,15 +7,28 @@ while yut.start:
         if event.type == pygame.QUIT:
             yut.start = False
             yut.running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+        elif event.type == pygame.MOUSEBUTTONDOWN :
+            if yut.startButton_rect.collidepoint(event.pos) :
                 yut.start = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            yut.start = False
-    yut.screen.blit(yut.background[0], (0, 0))
+            elif yut.helpButton_rect.collidepoint(event.pos) :
+                while yut.help :
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            yut.start = False
+                            yut.running = False
+                        elif event.type == pygame.MOUSEBUTTONDOWN :
+                            if yut.homeButton_rect.collidepoint(event.pos) :
+                                yut.help = False
+                    yut.screen.blit(yut.background[2], (0,0))
+                    yut.screen.blit(yut.homeButton, (yut.homeButton_x_pos, yut.homeButton_y_pos))
+                yut.help = True
+
+    yut.screen.blit(yut.background[0], (0,0))
+    yut.screen.blit(yut.startButton, (yut.startButton_x_pos, yut.startButton_y_pos))
+    yut.screen.blit(yut.helpButton, (yut.helpButton_x_pos, yut.helpButton_y_pos))
     pygame.display.update()
     
-while yut.running:
+while yut.running :
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             yut.running = False
