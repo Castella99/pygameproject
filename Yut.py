@@ -19,11 +19,14 @@ class YutGame(Prototype) :
     button_y_pos = None
     push = False
     running = True
+    background = []
+    start = True
 
     def __init__(self):
         super().__init__()
         pygame.display.set_caption(("yut Game"))
-        self.background = pygame.image.load(self.path+"/background/table.png")
+        self.background.append(pygame.image.load(self.path+"/background/start.png"))
+        self.background.append(pygame.image.load(self.path+"/background/table.png"))
         self.yut1 = pygame.image.load(self.path+"/entity/yut1.png")
         self.yut2 = pygame.image.load(self.path+"/entity/yut3.png")
         self.yut_size = self.yut1.get_rect().size
@@ -38,7 +41,7 @@ class YutGame(Prototype) :
         self.button_y_pos = (6 * self.screen_height / 7) - (self.button_height / 2)
 
     def redraw(self):
-        self.screen.blit(self.background, (0, 0))  # 배경 그리기
+        self.screen.blit(self.background[1], (0, 0))  # 배경 그리기
         if self.push:
             self.screen.blit(self.button1, (self.button_x_pos, self.button_y_pos))
         else:
