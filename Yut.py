@@ -57,5 +57,9 @@ class YutGame(Prototype) :
         print(self.yut)
         return self.push
 
+
+    def motion_up(self):
+        pass
+
 if __name__ == "__main__" :
     pass
