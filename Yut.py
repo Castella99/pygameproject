@@ -21,12 +21,17 @@ class YutGame(Prototype) :
     running = True
     background = []
     start = True
-
+    startButton = None
+    helpButton = None
+    homeButton = None
+    help = True
+    
     def __init__(self):
         super().__init__()
         pygame.display.set_caption(("yut Game"))
         self.background.append(pygame.image.load(self.path+"/background/start.png"))
         self.background.append(pygame.image.load(self.path+"/background/table.png"))
+        self.background.append(pygame.image.load(self.path+"/background/help.png"))
         self.yut1 = pygame.image.load(self.path+"/entity/yut1.png")
         self.yut2 = pygame.image.load(self.path+"/entity/yut3.png")
         self.yut_size = self.yut1.get_rect().size
@@ -39,6 +44,37 @@ class YutGame(Prototype) :
         self.button_height = self.button_size[1]
         self.button_x_pos = (8 * self.screen_width / 9) - (self.button_width / 2)
         self.button_y_pos = (6 * self.screen_height / 7) - (self.button_height / 2)
+        self.startButton = pygame.image.load(self.path+"/entity/startButton.png")
+        self.helpButton = pygame.image.load(self.path+"/entity/helpButton.png")
+        self.startButton_size = self.startButton.get_rect().size
+        self.startButton_width = self.startButton_size[0]
+        self.startButton_height = self.startButton_size[1]
+        self.startButton_x_pos = self.screen_width/2 - self.startButton_width/2
+        self.startButton_y_pos = self.screen_height/3*2 - self.startButton_height/2
+        self.startButton_rect = self.startButton.get_rect()
+        self.startButton_rect.left = self.startButton_x_pos
+        self.startButton_rect.top = self.startButton_y_pos
+        self.helpButton_size = self.helpButton.get_rect().size
+        self.helpButton_width = self.helpButton_size[0]
+        self.helpButton_height = self.helpButton_size[1]
+        self.helpButton_x_pos = self.screen_width/2 - self.helpButton_width/2
+        self.helpButton_y_pos = self.startButton_y_pos + self.helpButton_height
+        self.helpButton_rect = self.helpButton.get_rect()
+        self.helpButton_rect.left = self.helpButton_x_pos
+        self.helpButton_rect.top = self.helpButton_y_pos
+        self.homeButton = pygame.image.load(self.path+"/entity/home.png")
+        self.homeButton_size = self.homeButton.get_rect().size
+        self.homeButton_width = self.homeButton_size[0]
+        self.homeButton_height = self.homeButton_size[1]
+        self.homeButton_x_pos = self.screen_width/10*9 - self.homeButton_width/2
+        self.homeButton_y_pos = self.screen_height/5 - self.homeButton_height/2
+        self.homeButton_rect = self.homeButton.get_rect()
+        self.homeButton_rect.left = self.homeButton_x_pos
+        self.homeButton_rect.top = self.homeButton_y_pos
+
+        
+
+        
 
     def redraw(self):
         self.screen.blit(self.background[1], (0, 0))  # 배경 그리기
