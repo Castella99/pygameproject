@@ -1,46 +1,37 @@
-import Yut
+import YutGame
 import pygame
 
-yut = Yut.YutGame()
-while yut.start :
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            yut.start = False
-            yut.running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN :
-            if yut.startButton_rect.collidepoint(event.pos) :
-                yut.start = False
-            elif yut.helpButton_rect.collidepoint(event.pos) :
-                while yut.help :
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            yut.start = False
-                            yut.running = False
-                        elif event.type == pygame.MOUSEBUTTONDOWN :
-                            if yut.homeButton_rect.collidepoint(event.pos) :
-                                yut.help = False
-                    yut.screen.blit(yut.background[2], (0,0))
-                    yut.screen.blit(yut.homeButton, (yut.homeButton_x_pos, yut.homeButton_y_pos))
-                yut.help = True
+game = YutGame.YutGame()
 
-    yut.screen.blit(yut.background[0], (0,0))
-    yut.screen.blit(yut.startButton, (yut.startButton_x_pos, yut.startButton_y_pos))
-    yut.screen.blit(yut.helpButton, (yut.helpButton_x_pos, yut.helpButton_y_pos))
-    pygame.display.update()
-    
-while yut.running :
+while game.running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            yut.running = False
-        if event.type == pygame.KEYDOWN:
+            game.running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if game.start_button.rect.collidepoint(event.pos) and game.start_background:
+                game.start = True  # 보드판으로 이동
+            elif game.help_button.rect.collidepoint(event.pos) and game.start_background:
+                game.help = True  # 규칙 설명으로 이동
+            elif game.home_button.rect.collidepoint(event.pos) and game.help_background:
+                game.home = True  # 시작 화면으로 이동
+            elif game.red_button.rect.collidepoint(event.pos) and game.table_background:
+                game.red = True  # 보드판으로 이동
+            elif game.next_button.rect.collidepoint(event.pos) and game.board_background:
+                game.next = True  # 테이블로 이동
+            elif game.restart_button.rect.collidepoint(event.pos) and game.restart_button:
+                game.restart = True  # 시작 화면으로 이동
+            elif game.end_button.rect.collidepoint(event.pos) and game.end_button:
+                game.running = False  # 게임 종료
+        elif event.type == pygame.MOUSEBUTTONUP:
+            game.start = game.help = game.home = False
+            game.red = game.next = game.restart = False
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                yut.push = yut.button()
-        if event.type == pygame.KEYUP:
-            yut.push = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            yut.push = yut.button()
-        if event.type == pygame.MOUSEBUTTONUP:
-            yut.push = False
-    yut.redraw()
-    pygame.display.update() #게임 화면을 다시 그리기
+                game.green = True
+                game.push = game.button()  # 윷 던지기
+        elif event.type == pygame.KEYUP:
+            game.green = False
+        game.show_Background_and_Button()
+        pygame.display.update()
 pygame.quit()
+
