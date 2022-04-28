@@ -2,7 +2,7 @@ import Yut
 import pygame
 
 yut = Yut.YutGame()
-while yut.start:
+while yut.start :
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             yut.start = False

@@ -48,6 +48,7 @@ class YutGame(Prototype) :
         self.yut_size = self.yut1.get_rect().size
         self.yut_width = self.yut_size[0]
         self.yut_height = self.yut_size[1]
+
         self.button1 = pygame.image.load(self.path+"/entity/red button.png")
         self.button2 = pygame.image.load(self.path+"/entity/green button.png")
         self.button_size = self.button1.get_rect().size
@@ -55,8 +56,11 @@ class YutGame(Prototype) :
         self.button_height = self.button_size[1]
         self.button_x_pos = (8 * self.screen_width / 9) - (self.button_width / 2)
         self.button_y_pos = (6 * self.screen_height / 7) - (self.button_height / 2)
+
         self.startButton = pygame.image.load(self.path+"/entity/startButton.png")
+
         self.helpButton = pygame.image.load(self.path+"/entity/helpButton.png")
+
         self.startButton_size = self.startButton.get_rect().size
         self.startButton_width = self.startButton_size[0]
         self.startButton_height = self.startButton_size[1]
@@ -65,6 +69,7 @@ class YutGame(Prototype) :
         self.startButton_rect = self.startButton.get_rect()
         self.startButton_rect.left = self.startButton_x_pos
         self.startButton_rect.top = self.startButton_y_pos
+
         self.helpButton_size = self.helpButton.get_rect().size
         self.helpButton_width = self.helpButton_size[0]
         self.helpButton_height = self.helpButton_size[1]
@@ -73,6 +78,7 @@ class YutGame(Prototype) :
         self.helpButton_rect = self.helpButton.get_rect()
         self.helpButton_rect.left = self.helpButton_x_pos
         self.helpButton_rect.top = self.helpButton_y_pos
+
         self.homeButton = pygame.image.load(self.path+"/entity/home.png")
         self.homeButton_size = self.homeButton.get_rect().size
         self.homeButton_width = self.homeButton_size[0]
