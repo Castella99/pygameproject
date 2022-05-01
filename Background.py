@@ -17,7 +17,6 @@ class Background(Prototype):
                        "help": 3, "finish": 4, "board": 5}
 
     def __init__(self, prompt):
-        super().__init__()
         self.image = self.background_images[self.background_dict[prompt]]
 
     def put_image(self, prompt):

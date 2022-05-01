@@ -20,7 +20,6 @@ class Button(Prototype):
                    "end button": 6, "restart button": 7}
 
     def __init__(self, prompt, pos1, pos2, pos3, pos4):
-        super().__init__()
         self.image = self.button_images[self.button_dict[prompt]]
         self.size = self.image.get_rect().size
         self.width = self.size[0]
