@@ -4,34 +4,19 @@ import pygame
 game = YutGame.YutGame()
 
 while game.running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game.running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if game.start_button.rect.collidepoint(event.pos) and game.start_background:
-                game.start = True  # 보드판으로 이동
-            elif game.help_button.rect.collidepoint(event.pos) and game.start_background:
-                game.help = True  # 규칙 설명으로 이동
-            elif game.home_button.rect.collidepoint(event.pos) and game.help_background:
-                game.home = True  # 시작 화면으로 이동
-            elif game.red_button.rect.collidepoint(event.pos) and game.table_background:
-                game.red = True  # 보드판으로 이동
-            elif game.next_button.rect.collidepoint(event.pos) and game.board_background:
-                game.next = True  # 테이블로 이동
-            elif game.restart_button.rect.collidepoint(event.pos) and game.restart_button:
-                game.restart = True  # 시작 화면으로 이동
-            elif game.end_button.rect.collidepoint(event.pos) and game.end_button:
-                game.running = False  # 게임 종료
-        elif event.type == pygame.MOUSEBUTTONUP:
-            game.start = game.help = game.home = False
-            game.red = game.next = game.restart = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                game.green = True
-                game.push = game.button()  # 윷 던지기
-        elif event.type == pygame.KEYUP:
-            game.green = False
-        game.show_Background_and_Button()
+# 게임 파트를 3개로 나눔(시작과 도움말, 보드판과 윷판, 엔딩 화면)
+    while game.title_screen:  # 시작 부분
+        game.show_title_screen()  # 시작부분 이벤트와 화면그리기 (게임 초기 설정 추가 예정)
+        pygame.display.update()
+
+    while game.game_screen:  # 중간 부분
+        game.main_events()  # 게임 이벤트 (게임 말 이동, 플레이어 순서 추가 예정)
+        game.check()  # 승패 체크(미구현)
+        game.show_game_screen()  # 화면그리기 (보드판, 게임 말 추가예정)
+        pygame.display.update()
+
+    while game.ending_screen:  # 끝 부분
+        game.show_ending_screem()  # 끝 부분 이벤트와 화면그리기 (승자 패자 화면 출력 추가 예정)
         pygame.display.update()
 pygame.quit()
 
