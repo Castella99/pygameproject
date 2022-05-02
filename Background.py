@@ -1,11 +1,9 @@
+from Prototypegame import *
 import os
-import pygame
 
 
-class Background:
+class Background(Prototype):
     path = os.path.dirname(os.path.abspath(__file__))
-    screen_width = 1080  # 스크린 가로
-    screen_height = 720  # 스크린 세로
     prompt = "start"
     background_images = [
         pygame.image.load(path + "/background/empty.png"),
@@ -21,6 +19,6 @@ class Background:
     def __init__(self, prompt):
         self.image = self.background_images[self.background_dict[prompt]]
 
-    def put_image(self, prompt):  # 배경 객체의 prompt로 이미지를 변경함.
+    def put_image(self, prompt):
         self.image = self.background_images[self.background_dict[prompt]]
         return self.image
