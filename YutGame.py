@@ -24,6 +24,7 @@ class YutGame(Prototype):
     board = False
     table = False
     green = False
+    setting = False
 
     current_time = 0
     index = 0
@@ -66,8 +67,6 @@ class YutGame(Prototype):
                     self.title_screen = False
                     self.setting_screen = True
                     self.setting = True
-                    self.game_screen = True
-                    self.board = True
                 # 도움버튼을 누르면 규칙 설명 화면으로 넘어감
                 elif self.help_button.rect.collidepoint(event.pos):
                     self.help = True
