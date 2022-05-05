@@ -15,12 +15,15 @@ class Button:
         pygame.image.load(path + "/entity/home.png"),
         pygame.image.load(path + "/entity/next button.png"),
         pygame.image.load(path + "/entity/end button.png"),
-        pygame.image.load(path + "/entity/restart button.png")
+        pygame.image.load(path + "/entity/restart button.png"),
+        pygame.image.load(path + "/entity/down button.png"),
+        pygame.image.load(path + "/entity/up button.png")
     ]
     # 각 버튼을 딕셔너리로 만듦.
     button_dict = {"red button": 0, "green button": 1, "start button": 2,
                    "help button": 3, "home button": 4, "next button": 5,
-                   "end button": 6, "restart button": 7}
+                   "end button": 6, "restart button": 7, "down button": 8, 
+                   "up button": 9}
 
     def __init__(self, prompt, pos1, pos2, pos3, pos4):
         self.image = self.button_images[self.button_dict[prompt]]
