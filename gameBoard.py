@@ -20,10 +20,12 @@ board_pos = [
 14 18 19 20 00
 """
 # 아래 board_map 은 위 00부터 20까지의 위치(칸)을 리스트로 넣어 놓은 것
-board_map = [(600, 595), (595, 455), (590, 325), (600, 175), (600, 50),
-             (440, 217), (470, 50), (315, 55), (185, 50), (48, 48), (190, 200),
-             (50, 188), (45, 325), (43, 470), (48, 595), (190, 455), (310, 330),
-             (440, 450), (185, 595), (315, 595), (470, 595)]
+board_map = [board_pos[4][4], board_pos[3][4], board_pos[2][4], board_pos[1][4],
+             board_pos[0][4], board_pos[1][3], board_pos[0][3], board_pos[0][2],
+             board_pos[0][1], board_pos[0][0], board_pos[1][1], board_pos[1][0],
+             board_pos[2][0], board_pos[3][0], board_pos[4][0], board_pos[3][1],
+             board_pos[2][2], board_pos[3][3], board_pos[4][1], board_pos[4][2],
+             board_pos[4][3]]
 # 게임 스크린에 맞도록 보드칸 위치 값 수정
 for x in range(len(board_map)):
     board_map[x] = list(board_map[x])
