@@ -33,4 +33,5 @@ class Button:
         self.rect.left = self.x_pos
         self.rect.top = self.y_pos
 
-
+    def change_location(self,pos1, pos2, pos3, pos4):
+        pass

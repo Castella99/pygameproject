@@ -13,7 +13,7 @@ class Background:
         pygame.image.load(path + "/background/table color reverse.png"),
         pygame.image.load(path + "/background/help.PNG"),
         pygame.image.load(path + "/background/finish.png"),
-        pygame.image.load(path + "/background/board.png")
+        pygame.image.load(path + "/background/board.png")  # 9X13 칸
     ]
     background_dict = {"empty": 0, "start": 1, "table": 2,
                        "help": 3, "finish": 4, "board": 5}

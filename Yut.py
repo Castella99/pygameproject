@@ -52,3 +52,4 @@ class Yut(Prototype):
 
     def yut_state_reset(self):  # 윷 상태를 모두 앞으로 초기화 함.
         self.yut_state = [0, 0, 0, 0]
+

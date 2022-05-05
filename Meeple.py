@@ -1,9 +1,10 @@
-from Prototypegame import *
 import os
 
 
-class Meeple(Prototype):
+class Meeple():
     path = os.path.dirname(os.path.abspath(__file__))
 
     def __init__(self):
-        super().__init__()
+        self.
+
+
