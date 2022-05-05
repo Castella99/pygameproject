@@ -1,5 +1,6 @@
 import pygame.event
 import Yut
+import gameBoard
 from Prototypegame import*
 import Button
 import Background
@@ -12,13 +13,13 @@ class YutGame(Prototype):
     running = True
     push = False
 
-#현재 게임 상태가 어떤지 확인 하는 변수
+    # 현재 게임 상태가 어떤지 확인 하는 변수
     title_screen = True
     setting_screen = False
     game_screen = False
     ending_screen = False
 
-# 현재 어떤 버튼이 눌렸나 확인하는 변수들
+    # 현재 어떤 버튼이 눌렸나 확인하는 변수들
     home = True
     help = False
     board = False
@@ -37,7 +38,10 @@ class YutGame(Prototype):
         super().__init__()
         pygame.display.set_caption("yut Game")
         self.background = Background.Background("start")  # 배경 객체
-        self.yut = Yut.Yut("front", 1)  # 윷 객체
+
+        # 윷과 윷판 객체
+        self.yut = Yut.Yut("front", 1)
+        self.yut_board = gameBoard.GameBoard()
         self.animation_time = round(100 / len(self.yut.yut_images * 100), 2)
 
         # 각종 버튼 객체
@@ -140,6 +144,8 @@ class YutGame(Prototype):
             self.screen.blit(self.background.put_image("board"), (0, 0))
             self.screen.blit(self.next_button.image,
                              (self.next_button.x_pos, self.next_button.y_pos))
+            self.screen.blit(self.yut_board.image,
+                             (self.yut_board.x_pos, self.yut_board.y_pos))
         elif self.table:  # 윷 테이블로 이동하기 버튼 눌렀을 때
             self.screen.blit(self.background.put_image("table"), (0, 0))
             self.screen.blit(self.green_button.image,
