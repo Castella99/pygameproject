@@ -14,7 +14,10 @@ class YutGame(Prototype):
 
 #현재 게임 상태가 어떤지 확인 하는 변수
     title_screen = True
+<<<<<<< HEAD
     setting_screen = False
+=======
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
     game_screen = False
     ending_screen = False
 
@@ -24,7 +27,10 @@ class YutGame(Prototype):
     board = False
     table = False
     green = False
+<<<<<<< HEAD
     setting = False
+=======
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
 
     current_time = 0
     index = 0
@@ -49,10 +55,13 @@ class YutGame(Prototype):
         self.next_button = Button.Button("next button", 8, 9, 6, 7)
         self.restart_button = Button.Button("restart button", 1, 2, 2, 3)
         self.end_button = Button.Button("end button", 1, 2, 7, 8)
+<<<<<<< HEAD
         self.down_button1 = Button.Button("down button", 7, 12, 3, 8)
         self.up_button1 = Button.Button("up button", 4, 5, 3, 8)
         self.down_button2 = Button.Button("down button", 7, 12, 5, 9)
         self.up_button2 = Button.Button("up button", 4, 5, 5, 9)
+=======
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
 
     def show_title_screen(self):  # 시작 화면 (규칙 설명으로 이동하고 다시 돌아 올 수 있음)
         # 간단한 이벤트 부분 (start, help home 버튼 클릭)
@@ -65,8 +74,13 @@ class YutGame(Prototype):
                 # 시작버튼 누르면 중간부분(game_screen)의 보드판 화면으로 넘어감
                 if self.start_button.rect.collidepoint(event.pos):
                     self.title_screen = False
+<<<<<<< HEAD
                     self.setting_screen = True
                     self.setting = True
+=======
+                    self.game_screen = True
+                    self.board = True
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
                 # 도움버튼을 누르면 규칙 설명 화면으로 넘어감
                 elif self.help_button.rect.collidepoint(event.pos):
                     self.help = True
@@ -86,6 +100,7 @@ class YutGame(Prototype):
             self.screen.blit(self.background.put_image("help"), (0, 0))
             self.screen.blit(self.home_button.image,
                              (self.home_button.x_pos, self.home_button.y_pos))
+<<<<<<< HEAD
     
     def show_setting_screen(self) :
         for event in pygame.event.get():
@@ -133,6 +148,9 @@ class YutGame(Prototype):
             self.screen.blit(self.player_text, (735,260))
             self.screen.blit(self.computer_text, (735,385))
         
+=======
+
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
 
     def show_game_screen(self):  # 게임 화면(윷놀이가 진행될 때의 화면)
         if self.board:
@@ -206,7 +224,11 @@ class YutGame(Prototype):
             self.yut.image = self.yut.yut_images[self.index]  # 윷의 이미지는 앞, 우, 뒤, 좌로 돌아감
             self.yut.display_yut()  # 윷 4개 화면에 출력
 
+<<<<<<< HEAD
     def show_ending_screen(self):  # 엔딩화면 (재시작과 종료버튼을 다룸)
+=======
+    def show_ending_screem(self):  # 엔딩화면 (재시작과 종료버튼을 다룸)
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
     # 간단한 이벤트 부분 (restart, end 버튼 클릭 이벤트)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -230,8 +252,11 @@ class YutGame(Prototype):
         self.screen.blit(self.restart_button.image,
                          (self.restart_button.x_pos, self.restart_button.y_pos))
 
+<<<<<<< HEAD
     def button_screen_blit(self, button) :
         self.screen.blit(button.image, (button.x_pos, button.y_pos))
+=======
+>>>>>>> 6780d3ccfc346e94225705e304f96977d77cc55a
 
 if __name__ == "__main__":
     pass
