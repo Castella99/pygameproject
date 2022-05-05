@@ -1,9 +1,12 @@
-from Prototypegame import*
 import os
+import pygame
 
 
-class Button(Prototype):
+class Button:
     path = os.path.dirname(os.path.abspath(__file__))
+    screen_width = 1080  # 스크린 가로
+    screen_height = 720  # 스크린 세로
+    # 버튼 이미지 리스트
     button_images = [
         pygame.image.load(path + "/entity/red button.png"),
         pygame.image.load(path + "/entity/green button.png"),
@@ -12,12 +15,15 @@ class Button(Prototype):
         pygame.image.load(path + "/entity/home.png"),
         pygame.image.load(path + "/entity/next button.png"),
         pygame.image.load(path + "/entity/end button.png"),
-        pygame.image.load(path + "/entity/restart button.png")
+        pygame.image.load(path + "/entity/restart button.png"),
+        pygame.image.load(path + "/entity/down button.png"),
+        pygame.image.load(path + "/entity/up button.png")
     ]
-    show_button = None
+    # 각 버튼을 딕셔너리로 만듦.
     button_dict = {"red button": 0, "green button": 1, "start button": 2,
                    "help button": 3, "home button": 4, "next button": 5,
-                   "end button": 6, "restart button": 7}
+                   "end button": 6, "restart button": 7, "down button": 8, 
+                   "up button": 9}
 
     def __init__(self, prompt, pos1, pos2, pos3, pos4):
         self.image = self.button_images[self.button_dict[prompt]]
