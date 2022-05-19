@@ -21,7 +21,7 @@ class Prototype:
         # 스크린 설정
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         # 게임 폰트 설정
-        self.game_font = pygame.font.Font(None, 40)
+        self.game_font = pygame.font.Font("Maplestory.ttf", 40)
         
         self.start_ticks = pygame.time.get_ticks()  # 시작 tick을 받아옴
         # 이벤트 루프 구현 (메서드 오버라이딩)
