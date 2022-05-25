@@ -37,9 +37,10 @@ class YutGame(Prototype):
     current_time = 0
     index = 0
     animation_time = None
-
-    player = 1
-    computer = 0
+    #  초기 설정: 사람의 수와 컴퓨터의 수와 인당 가질 말의 수를 결정하는 변수 (컴퓨터수와 사람의 수의 합은 6)
+    num_of_player = 0
+    num_of_computer = 0
+    num_of_meeple = 0
 
     meeple_button_list = []
     meeple_color_list = ["red", "orange", "yellow", "green", "blue", "purple"]
@@ -127,25 +128,25 @@ class YutGame(Prototype):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # 시작버튼 누르면 중간부분(game_screen)의 보드판 화면으로 넘어감
                 if self.down_button1.rect.collidepoint(event.pos):
-                    if self.player == 1:
-                        self.player = 1
+                    if self.num_of_player == 1:
+                        self.num_of_player = 1
                     else:
-                        self.player -= 1
+                        self.num_of_player -= 1
                 elif self.up_button1.rect.collidepoint(event.pos):
-                    if self.player + self.computer >= 6:
+                    if self.num_of_player + self.num_of_computer >= 6:
                         pass
                     else:
-                        self.player += 1
+                        self.num_of_player += 1
                 elif self.down_button2.rect.collidepoint(event.pos):
-                    if self.computer == 0:
-                        self.computer = 0
+                    if self.num_of_computer == 0:
+                        self.num_of_computer = 0
                     else:
-                        self.computer -= 1
+                        self.num_of_computer -= 1
                 elif self.up_button2.rect.collidepoint(event.pos):
-                    if self.player + self.computer >= 7:
+                    if self.num_of_player + self.num_of_computer >= 6:
                         pass
                     else:
-                        self.computer += 1
+                        self.num_of_computer += 1
                 elif self.next_button.rect.collidepoint(event.pos):
                     self.setting = False
                     self.setting_screen = False
@@ -153,8 +154,9 @@ class YutGame(Prototype):
                     self.meeple = True
 
         # 화면 그리기
-        self.player_text = self.game_font.render(str(self.player), True, (0, 0, 0))
-        self.computer_text = self.game_font.render(str(self.computer), True, (0, 0, 0))
+        self.player_text = self.game_font.render(str(self.num_of_player), True, (0, 0, 0))
+        self.computer_text = self.game_font.render(str(self.num_of_computer), True, (0, 0, 0))
+        self.meeple_num = self.game_font.render(str(self.num_of_meeple), True, (0, 0, 0))
 
         if self.setting:
             self.screen.blit(self.background.put_image("setting"), (0, 0))
@@ -198,14 +200,14 @@ class YutGame(Prototype):
                 entity.y_pos = (self.screen_height / 2) - (entity.height / 2)
                 self.button_screen_blit(entity)
 
-            if self.init_text == self.player:
+            if self.init_text == self.num_of_player:
                 self.text_blit("player의 말을 골라주세요!", 255, 100, 100, self.screen_width / 2, 200)
             elif self.init_text != 0:
                 self.text_blit(str(self.init_text) + "명 더 골라주세요!", 255, 100, 100, 540, 200)
             else:
                 self.text_blit("말을 모두 골랐습니다! 다음으로 넘어가주세요.", 255, 100, 100, 540, 200)
                 self.next_board = True
-                com_mee_idx_list = random.sample(self.computer_mee_list, self.computer)
+                com_mee_idx_list = random.sample(self.computer_mee_list, self.num_of_computer)
                 for i in com_mee_idx_list:
                     self.computer_list.append(Computer.Computer(i - 1))
 
