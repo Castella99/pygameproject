@@ -1,5 +1,7 @@
 import os
 import pygame
+
+import gameBoard
 from gameBoard import board_map
 
 
@@ -31,10 +33,11 @@ class Meeple:
         "void": [pygame.image.load(path + "/meeple/void.png")]
     }
 
-    def __init__(self, color="red", pos=0):
+    def __init__(self, color="red", pos=0, state=0):
         self.color = color  # 내 게임 말의 색깔
         self.sum = 0  # 업은 수
         self.pos = pos  # 내가 현재 위치하는 칸
+        self.state = state  # 0=아직, 1=보드위, 2=통과
 
         self.image = self.mipple_images[color][self.sum]
         self.size = self.image.get_rect().size
@@ -46,11 +49,11 @@ class Meeple:
         self.rect.left = self.x_pos
         self.rect.top = self.y_pos
 
-    # 게임 말 이동 (num 만큼 칸을 이동함)
+    # 게임 말 이동 (num 만큼 칸을 이동함) (수정 필요)
     # ex) 도이면 num=1, 윷이면 num=4
     def move(self, num):
         self.pos += num
-        if self.pos >= 21:
+        if self.pos >= len(gameBoard.board_map):
             self.pos = 0
         self.x_pos = board_map[self.pos][0] - (self.width/2)
         self.y_pos = board_map[self.pos][1] - (self.height/2)

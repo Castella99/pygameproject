@@ -20,7 +20,8 @@ while game.running:
         game.show_meeple_screen()
         pygame.display.update()
 
-    # 중간 부분
+    # 게임 중
+    game.set_order()
     while game.game_screen:
         game.main_events()  # 게임 이벤트 (게임 말 이동, 플레이어 순서 추가 예정)
         game.check()  # 승패 체크(미구현)
