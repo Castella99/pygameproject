@@ -4,9 +4,12 @@ import os
 
 class Yut(Prototype):
     path = os.path.dirname(os.path.abspath(__file__))
-    yut_state = [0, 0, 0, 0]  # 윷의 결과(상태) 모두 앞면을 바라보도록 초기화
-    yut_dict = {"front": 0, "back": 1, "right": 2, "left": 3}  # 윷의 모양을 딕셔너리로 만듦. (prompt로 사용)
-    result_dict = {"do": 1, "gae": 2, "geol": 3, "yut": 4, "mo": 5}  # 도, 개, 걸, 윷, 모
+    # 윷의 결과(상태) 모두 앞면을 바라보도록 초기화
+    yut_state = [0, 0, 0, 0]
+    # 윷의 모양을 딕셔너리로 만듦. (prompt로 사용)
+    yut_dict = {"front": 0, "back": 1, "right": 2, "left": 3}
+    # 도, 개, 걸, 윷, 모
+    result_dict = {"do": 1, "gae": 2, "geol": 3, "yut": 4, "mo": 5}
     yut_images = [
         pygame.image.load(path + "/entity/yut_front.png"),
         pygame.image.load(path + "/entity/yut_back.png"),

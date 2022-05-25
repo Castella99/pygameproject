@@ -14,10 +14,12 @@ class Background:
         pygame.image.load(path + "/background/help.PNG"),
         pygame.image.load(path + "/background/finish.png"),
         pygame.image.load(path + "/background/board.png"),
-        pygame.image.load(path + "/background/setting.png")
+        pygame.image.load(path + "/background/setting.png"),
+        pygame.image.load(path + "/background/meeple.png")
     ]
     background_dict = {"empty": 0, "start": 1, "table": 2,
-                       "help": 3, "finish": 4, "board": 5, "setting":6}
+                       "help": 3, "finish": 4, "board": 5,
+                       "setting": 6, "meeple": 7}
 
     def __init__(self, prompt):
         self.image = self.background_images[self.background_dict[prompt]]

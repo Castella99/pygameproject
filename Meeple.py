@@ -27,7 +27,8 @@ class Meeple:
                  pygame.image.load(path + "/entity/mipple blue3.png")],
         "purple": [pygame.image.load(path + "/entity/mipple purple1.png"),
                    pygame.image.load(path + "/entity/mipple purple2.png"),
-                   pygame.image.load(path + "/entity/mipple purple3.png")]
+                   pygame.image.load(path + "/entity/mipple purple3.png")],
+        "void": [pygame.image.load(path + "/meeple/void.png")]
     }
 
     def __init__(self, color="red", pos=0):
@@ -62,5 +63,10 @@ class Meeple:
             self.sum = 0
         self.image = self.mipple_images[self.color][self.sum]
 
+    def set_rect(self):
+        self.rect = self.image.get_rect()
+        self.rect.left = self.x_pos
+        self.rect.top = self.y_pos
 
-
+    def set_void(self):
+        self.image = self.mipple_images["void"][0]

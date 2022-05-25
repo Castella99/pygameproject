@@ -39,3 +39,8 @@ class Button:
     def change_location(self, pos1, pos2, pos3, pos4):
         self.x_pos = (pos1 * self.screen_width / pos2) - (self.width / 2)
         self.y_pos = (pos3 * self.screen_height / pos4) - (self.height / 2)
+
+    def rect(self):
+        self.rect = self.image.get_rect()
+        self.rect.left = self.x_pos
+        self.rect.top = self.y_pos
