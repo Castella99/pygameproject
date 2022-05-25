@@ -48,6 +48,8 @@ class YutGame(Prototype):
     player_list = []
     computer_list = []
     computer_mee_list = [1, 2, 3, 4, 5, 6]
+    setcomputer = True
+    order = []  # 플레이어 총 순서
 
     def __init__(self):
         super().__init__()
@@ -86,7 +88,8 @@ class YutGame(Prototype):
         for color in self.meeple_color_list:
             self.meeple_button_list.append(Meeple.Meeple(color, 0))
 
-    def show_title_screen(self):  # 시작 화면 (규칙 설명으로 이동하고 다시 돌아 올 수 있음)
+    # 시작 화면 (규칙 설명으로 이동하고 다시 돌아 올 수 있음)
+    def show_title_screen(self):
         # 간단한 이벤트 부분 (start, help home 버튼 클릭)
         for event in pygame.event.get():
             # 창 닫기 누르면 끝 부분(ENDING_SCREEN)으로 넘어감
@@ -107,6 +110,7 @@ class YutGame(Prototype):
                 elif self.home_button.rect.collidepoint(event.pos):
                     self.home = True
                     self.help = False
+
         # 화면 출력 부분
         if self.home:  # 시작 화면과 시작 버튼, 도움 버튼
             self.screen.blit(self.background.put_image("start"), (0, 0))
@@ -118,7 +122,8 @@ class YutGame(Prototype):
             self.screen.blit(self.background.put_image("help"), (0, 0))
             self.screen.blit(self.home_button.image,
                              (self.home_button.x_pos, self.home_button.y_pos))
-    
+
+    # 플레이어 수, 게임말 개수 설정 화면
     def show_setting_screen(self):
         # 이벤트 처리
         for event in pygame.event.get():
@@ -168,7 +173,6 @@ class YutGame(Prototype):
         self.player_text = self.game_font.render(str(self.num_of_player), True, (0, 0, 0))
         self.computer_text = self.game_font.render(str(self.num_of_computer), True, (0, 0, 0))
         self.meeple_num = self.game_font.render(str(self.num_of_meeple), True, (0, 0, 0))
-
         if self.setting:
             self.screen.blit(self.background.put_image("setting"), (0, 0))
             self.button_screen_blit(self.next_button_up)
@@ -183,6 +187,7 @@ class YutGame(Prototype):
             self.screen.blit(self.meeple_num, (735, 540))
             self.init_text = self.num_of_player
 
+    # 플레이어마다 게임말 선택
     def show_meeple_screen(self):
         # 이벤트 처리
         for event in pygame.event.get():
@@ -191,14 +196,17 @@ class YutGame(Prototype):
                 self.meeple_screen = False
                 self.ending_screen = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # 시작버튼 누르면 중간부분(game_screen)의 보드판 화면으로 넘어감
+                temp = []
+                # 플레이어 수만큼 이미지 선택 + player_list에 초기화
                 for mee in self.meeple_button_list:
                     if mee.rect.collidepoint(event.pos):
                         self.init_text -= 1
-                        self.player_list.append(Player.Player(self.meeple_button_list.index(mee)))
+                        self.player_list.append(Player.Player(self.num_of_meeple, mee.color))
                         print(self.meeple_button_list.index(mee))
                         self.computer_mee_list.remove(self.meeple_button_list.index(mee) + 1)
                         mee.set_void()
+
+                # 시작버튼 누르면 중간부분(game_screen)의 보드판 화면으로 넘어감
                 if self.next_button.rect.collidepoint(event.pos) and self.next_board:
                     self.meeple = False
                     self.meeple_screen = False
@@ -221,14 +229,16 @@ class YutGame(Prototype):
                 self.text_blit("player의 말을 골라주세요!", 255, 100, 100, self.screen_width / 2, 200)
             elif self.init_text != 0:
                 self.text_blit(str(self.init_text) + "명 더 골라주세요!", 255, 100, 100, 540, 200)
-            else:
+            elif self.setcomputer:
                 self.text_blit("말을 모두 골랐습니다! 다음으로 넘어가주세요.", 255, 100, 100, 540, 200)
                 self.next_board = True
                 com_mee_idx_list = random.sample(self.computer_mee_list, self.num_of_computer)
-                for i in com_mee_idx_list:
-                    self.computer_list.append(Computer.Computer(i - 1))
+                for mee in com_mee_idx_list:
+                    self.computer_list.append(Computer.Computer(self.num_of_meeple, self.meeple_button_list[mee-1].color))
+                    self.setcomputer = False
 
-    def show_game_screen(self):  # 게임 화면(윷놀이가 진행될 때의 화면)
+    # 게임 화면(윷놀이가 진행될 때의 화면)
+    def show_game_screen(self):
         if self.board:
             self.yut.yut_state_reset()  # 윷을 모두 앞으로 리셋
             self.screen.blit(self.background.put_image("board"), (0, 0))
@@ -261,6 +271,18 @@ class YutGame(Prototype):
                 self.yut.display_yut()
                 self.screen.blit(self.red_button.image,
                                  (self.red_button.x_pos, self.red_button.y_pos))
+
+    def set_order(self):
+        while len(self.computer_list)+len(self.player_list) != 0:
+            i = random.randrange(2)
+            if i == 0 and len(self.computer_list) != 0:
+                j = random.randrange(len(self.computer_list))
+                self.order.append(self.computer_list[j])
+                del self.computer_list[j]
+            elif i == 1 and len(self.player_list) != 0:
+                j = random.randrange(len(self.computer_list))
+                self.order.append(self.player_list[j])
+                del self.player_list[j]
 
     def main_events(self):
         for event in pygame.event.get():
@@ -358,4 +380,5 @@ class YutGame(Prototype):
 
 
 if __name__ == "__main__":
-    pass
+    test = YutGame()
+    print(test.computer_list)
