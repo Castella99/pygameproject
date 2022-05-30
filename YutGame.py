@@ -193,7 +193,7 @@ class YutGame(Prototype):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # 시작버튼 누르면 중간부분(game_screen)의 보드판 화면으로 넘어감
                 for mee in self.meeple_button_list:
-                    if mee.rect.collidepoint(event.pos):
+                    if mee.rect.collidepoint(event.pos) and self.init_text > 0 :
                         self.init_text -= 1
                         self.player_list.append(Player.Player(self.meeple_button_list.index(mee)))
                         print(self.meeple_button_list.index(mee))
