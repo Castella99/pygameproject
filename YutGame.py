@@ -309,8 +309,9 @@ class YutGame(Prototype):
                             self.order[self.order_idx].board_num < self.num_of_meeple and \
                             len(self.screen_mee_list[self.order_idx]) != 0 :
                         self.mee_button[i].minus_sum()
-                        self.screen_mee_list[self.order_idx].append(self.order[self.order_idx].meeples[2])
                         self.order[self.order_idx].board_num += 1
+                        self.screen_mee_list[self.order_idx].append(
+                            self.order[self.order_idx].meeples[self.order[self.order_idx].board_num])
 
             elif event.type == pygame.MOUSEBUTTONUP: # 윷 돌리기
                 self.push = False

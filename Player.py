@@ -11,6 +11,7 @@ class Player:
     meeple = ["blue.png", "green.png", "purple.png", "red.png", "orange.png", "yellow.png"] # 말의 파일명 리스트
     num = 0 # meeple의 숫자
     board_num = 0 # 보드판 위의 meeple 숫자
+    mee_idx = 0 # 움직일 말의 숫자
 
     def __init__(self, num_of_meeple=1, mycolor=""):
         self.yut_result = []  # 던져서 나온 윷 결과를 저장함.
@@ -26,4 +27,6 @@ class Player:
 
     def move(self):
         pass
-    
+
+    def set_mee_num(self, mee):
+        self.mee_idx = mee
