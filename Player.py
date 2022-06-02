@@ -20,9 +20,9 @@ class Player:
         self.num = num_of_meeple
         for i in range(self.num+1):
             if i == 0 :
-                self.meeples.append(Meeple.Meeple(self.color, 0, 0, self.num))
+                self.meeples.append(Meeple.Meeple(self.color, 0, 0, 0))
             else :
-                self.meeples.append(Meeple.Meeple(self.color, 0, 0))
+                self.meeples.append(Meeple.Meeple(self.color, 0, 0, 1))
 
     def move(self):
         pass

@@ -81,3 +81,8 @@ class Meeple:
     def minus_sum(self):
         self.sum -= 1
         self.image = self.mipple_images[self.color][self.sum]
+
+    def set_pos(self, x, y):
+        self.x_pos = x
+        self.y_pos = y
+        self.set_rect()

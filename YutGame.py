@@ -55,7 +55,8 @@ class YutGame(Prototype):
     meeple_move = False # 윷을 던지고 말을 움직이게 하는 변수
     order_idx = 0 # 현재 순번의 말
     yut_rst = 0 # 윳 던진 결과
-    screen_mee_list = [] # 스크린상에 표시되어야할 말 리스트
+    screen_mee_list = [] # 스크린상에 표시되어야할 말
+    mee_button = []
 
     def __init__(self):
         super().__init__()
@@ -174,6 +175,8 @@ class YutGame(Prototype):
                     self.setting_screen = False
                     self.meeple_screen = True
                     self.meeple = True
+                    for i in range(self.num_of_player) :
+                        self.screen_mee_list.append([]) # 플레이어 수만큼 리스트 추가
 
         # 화면 그리기
         self.player_text = self.game_font.render(str(self.num_of_player), True, (0, 0, 0))
@@ -255,11 +258,13 @@ class YutGame(Prototype):
                 j = random.randrange(len(self.player_list))
                 self.order.append(self.player_list[j])
                 del self.player_list[j]
+        for i in self.order :
+            self.mee_button.append(Meeple.Meeple(i.meeples[self.num_of_meeple].color, sum=self.num_of_meeple))
 
     # 게임 화면(윷놀이가 진행될 때의 화면)
     def show_game_screen(self):
         if self.board:
-            self.board_screen_blit()
+            self.board_screen_blit() # 보드판 화면 구현 함수
             if self.meeple_move : # 윷을 던진 결과를 보드에 적용
                 self.move_meeple()
                 self.meeple_move = False
@@ -276,7 +281,7 @@ class YutGame(Prototype):
                     self.button()
                     self.motion_update(60)
                 else:  # 스페이스바를 뗐을 때 결과 출력
-                    self.main_delay(1)
+                    self.main_delay(1) # 윷 결과 1초동안 보여주기
                     self.yut_rst = self.yut.result()
                     self.table = False
                     self.board = True
@@ -288,17 +293,7 @@ class YutGame(Prototype):
             if event.type == pygame.QUIT: # 종료
                 self.game_screen = False
                 self.ending_screen = True
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                """
-                # 클릭하면 말 이동하고 업기 해봄. #################################
-                self.meeple1.move(1)  # 일단 한번 테스트 해봄 (무조건 바꿔야 함.)
-                self.meeple2.move(2)
-                self.meeple3.move(3)
-                self.meeple1.carry_my_back()
-                self.meeple2.carry_my_back()
-                self.meeple3.carry_my_back()
-                #############################################################
-                """
+            elif event.type == pygame.MOUSEBUTTONDOWN :
                 if self.next_button.rect.collidepoint(event.pos) and self.board: # 다음 버튼 눌렀을 때 보드판으로 이동
                     self.board = False
                     self.table = True
@@ -309,6 +304,14 @@ class YutGame(Prototype):
                 if self.green_button.rect.collidepoint(event.pos) and self.table: # 그린 버튼 눌렀을 때 윷 돌리기
                     self.green = True
                     self.push = True
+                for i, mee in enumerate(self.mee_button) : # 우측 말 판 표시기
+                    if mee.rect.collidepoint(event.pos) and self.board and self.order_idx == i and \
+                            self.order[self.order_idx].board_num < self.num_of_meeple and \
+                            len(self.screen_mee_list[self.order_idx]) != 0 :
+                        self.mee_button[i].minus_sum()
+                        self.screen_mee_list[self.order_idx].append(self.order[self.order_idx].meeples[2])
+                        self.order[self.order_idx].board_num += 1
+
             elif event.type == pygame.MOUSEBUTTONUP: # 윷 돌리기
                 self.push = False
             elif event.type == pygame.KEYDOWN: # 키보드 입력
@@ -373,7 +376,7 @@ class YutGame(Prototype):
     def button_screen_blit(self, button): # 버튼 화면에 표시 함수
         self.screen.blit(button.image, (button.x_pos, button.y_pos))
 
-    def text_blit(self, text, r, g, b, x, y):
+    def text_blit(self, text, r, g, b, x, y): # 텍스트 출력 함수
         text_render = self.game_font.render(text, True, (r, g, b))
         text_rect = text_render.get_rect().size
         text_width = text_rect[0]
@@ -381,7 +384,7 @@ class YutGame(Prototype):
         self.screen.blit(text_render, (x - text_width / 2, y - text_height / 2))
 
     def meeple_screen_blit(self, mee): # 말 화면에 나타내기 함수
-        self.screen.blit(mee.image, (mee.x_pos, mee.y_pos))
+        self.screen.blit(mee.image, (mee.x_pos - mee.width/2, mee.y_pos - mee.height/2))
 
     def main_delay(self, sec): # 딜레이 함수
         temp_ticks = pygame.time.get_ticks()
@@ -395,7 +398,7 @@ class YutGame(Prototype):
             self.yut.result()
             pygame.display.update()
 
-    def board_screen_blit(self):
+    def board_screen_blit(self): # 보드 화면 출력
         self.yut.yut_state_reset()  # 윷을 모두 앞으로 리셋
         self.screen.blit(self.background.put_image("board"), (0, 0))
         self.screen.blit(self.next_button.image,
@@ -404,27 +407,31 @@ class YutGame(Prototype):
                          (self.yut_board.x_pos, self.yut_board.y_pos))
         for i, player_mee in enumerate(self.order):
             self.text_blit("{}번".format(i + 1), 0, 0, 0, 855, 45 + 90 * i)
-            self.screen.blit(player_mee.meeples[0].image, (945 - player_mee.meeples[0].width / 2,
-                                                           45 + 90 * i - player_mee.meeples[0].height / 2))
+            self.mee_button[i].set_pos(945, 45+90*i)
+            self.meeple_screen_blit(self.mee_button[i])
+        if (self.order_idx >= len(self.order)):
+            self.order_idx = 0
+        self.text_blit("<-", 255, 0, 0, 1035, 45+90*self.order_idx)
+        for screen_player in self.screen_mee_list:  # 보드판 위 말 화면에 출력
+            for screen_mee in screen_player :
+                self.meeple_screen_blit(screen_mee)
+        if len(self.screen_mee_list[self.order_idx]) != 0 :
+            self.meeple_screen_blit(self.screen_mee_list[self.order_idx][0])
 
-        for screen_mee in self.screen_mee_list:  # 보드판 위 말 화면에 출력
-            self.meeple_screen_blit(screen_mee)
-
-    def move_meeple_sec(self, move, mee):
+    def move_meeple_sec(self, move, mee): # 한 칸씩 움직이기
         for i in range(move) :
             temp_ticks = pygame.time.get_ticks()
-            while (pygame.time.get_ticks() - temp_ticks <= 1) :
+            while (pygame.time.get_ticks() - temp_ticks <= 500) :
                 self.board_screen_blit()
                 pygame.display.update()
             mee.move(1)
 
     def move_meeple(self): # 화면상에서 말 움직이기 함수
-        if (self.order_idx >= len(self.order)):
-            self.order_idx = 0
         if self.order[self.order_idx].board_num == 0:
-            self.screen_mee_list.append(self.order[self.order_idx].meeples[1])
-            self.order[self.order_idx].meeples[0].minus_sum()
+            self.screen_mee_list[self.order_idx].append(self.order[self.order_idx].meeples[1])
             self.order[self.order_idx].board_num += 1
+            self.meeple_screen_blit(self.screen_mee_list[self.order_idx][0])
+            self.mee_button[self.order_idx].minus_sum()
 
         if self.yut_rst == 1:
             self.move_meeple_sec(1, self.order[self.order_idx].meeples[1])
