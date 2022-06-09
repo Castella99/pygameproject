@@ -11,10 +11,29 @@ import pygame
 import os
 import random
 
+
 class YutGame(Prototype):
     path = os.path.dirname(os.path.abspath(__file__))
+
     running = True
     push = False
+
+    # 각종 버튼 객체
+    start_button = Button.Button("start button", 1, 2, 2, 3)
+    help_button = Button.Button("help button", 1, 2, 7, 8)
+    home_button = Button.Button("home button", 8, 10, 1, 6)
+    red_button = Button.Button("red button", 1, 2, 6, 7)
+    green_button = Button.Button("green button", 1, 2, 6, 7)
+    next_button = Button.Button("next button", 8, 9, 6, 7)
+    next_button_up = Button.Button("next button", 8, 9, 1, 7)
+    restart_button = Button.Button("restart button", 1, 2, 2, 3)
+    end_button = Button.Button("end button", 1, 2, 7, 8)
+    down_button1 = Button.Button("down button", 7, 12, 3, 8)
+    up_button1 = Button.Button("up button", 4, 5, 3, 8)
+    down_button2 = Button.Button("down button", 7, 12, 5, 9)
+    up_button2 = Button.Button("up button", 4, 5, 5, 9)
+    down_button3 = Button.Button("down button", 7, 12, 7, 9)
+    up_button3 = Button.Button("up button", 4, 5, 7, 9)
 
     # 현재 게임 상태가 어떤지 확인 하는 변수
     title_screen = True
@@ -32,16 +51,18 @@ class YutGame(Prototype):
     setting = False
     meeple = False
 
+    # 윷 돌아가는 에니메이션에 필요한 변수
     current_time = 0
-    index = 0
+    animation_index = 0
     animation_time = None
-    #  초기 설정: 사람의 수와 컴퓨터의 수와 인당 가질 말의 수를 결정하는 변수 (컴퓨터수와 사람의 수의 합은 6)
+
+    # player 초기화에 필요한 변수
+    #  초기 설정: 사람의 수와 컴퓨터의 수와 인당 가질 말의 수를 결정하는 변수 (컴퓨터 수와 사람의 수의 합은 6)
     num_of_player = 1
     num_of_computer = 0
     num_of_meeple = 1
-
     meeple_button_list = []
-    meeple_color_list = ["red", "orange", "yellow", "green", "blue", "purple"]
+
     init_text = 0
     next_board = False
 
@@ -68,24 +89,8 @@ class YutGame(Prototype):
         self.meeple3 = Meeple.Meeple("blue", 0)
         #######################################################
 
-        # 각종 버튼 객체
-        self.start_button = Button.Button("start button", 1, 2, 2, 3)
-        self.help_button = Button.Button("help button", 1, 2, 7, 8)
-        self.home_button = Button.Button("home button", 8, 10, 1, 6)
-        self.red_button = Button.Button("red button", 1, 2, 6, 7)
-        self.green_button = Button.Button("green button", 1, 2, 6, 7)
-        self.next_button = Button.Button("next button", 8, 9, 6, 7)
-        self.next_button_up = Button.Button("next button", 8, 9, 1, 7)
-        self.restart_button = Button.Button("restart button", 1, 2, 2, 3)
-        self.end_button = Button.Button("end button", 1, 2, 7, 8)
-        self.down_button1 = Button.Button("down button", 7, 12, 3, 8)
-        self.up_button1 = Button.Button("up button", 4, 5, 3, 8)
-        self.down_button2 = Button.Button("down button", 7, 12, 5, 9)
-        self.up_button2 = Button.Button("up button", 4, 5, 5, 9)
-        self.down_button3 = Button.Button("down button", 7, 12, 7, 9)
-        self.up_button3 = Button.Button("up button", 4, 5, 7, 9)
-
-        for color in self.meeple_color_list:
+        meeple_color_list = ["red", "orange", "yellow", "green", "blue", "purple"]
+        for color in meeple_color_list:
             self.meeple_button_list.append(Meeple.Meeple(color, 0))
 
     # 시작 화면 (규칙 설명으로 이동하고 다시 돌아 올 수 있음)
@@ -237,6 +242,17 @@ class YutGame(Prototype):
                     self.computer_list.append(Computer.Computer(self.num_of_meeple, self.meeple_button_list[mee-1].color))
                     self.setcomputer = False
 
+#-----------------------------------------------------------------------------------------------------
+    def logic(self):
+        next_turn = False
+        while len(self.order) != 1:
+            for player in self.order:
+                while not next_turn:
+                    if player.state != 0:
+                        continue
+                    player.throw_yut()
+
+#-----------------------------------------------------------------------------------------------------
     # 게임 화면(윷놀이가 진행될 때의 화면)
     def show_game_screen(self):
         if self.board:
@@ -265,7 +281,7 @@ class YutGame(Prototype):
             self.yut.display_yut()
         if self.green:  # 윷 던지기(스페이스바)를 눌렀을 때
             if self.push:  # 스페이스바를 누르고 있을 때 윷 애니메이션 작동
-                self.button()
+                self.throw_yut()
                 self.motion_update(60)
             else:  # 스페이스바를 뗐을 때 결과 출력
                 self.yut.display_yut()
@@ -319,32 +335,36 @@ class YutGame(Prototype):
             elif event.type == pygame.KEYUP:
                 self.push = False
 
-    def check(self):  # 승패가 갈렸는지 확인 (미구현 상태)
+    # 승패가 갈렸는지 확인 (미구현 상태)
+    def check(self):
         pass
         # if 승패가 나면:
         #   self.game_screen = False
         #   self.ending_screen = True
 
-    def button(self):  # 윷 던지기(윷의 상태를 랜덤으로 생성 함)
+    # 윷 던지기(윷의 상태를 랜덤으로 생성 함)
+    def throw_yut(self):
         self.yut.yut_state.clear()  # 윷 상태 리스트 초기화
         for i in range(4):  # 윷 상태 만들기
             self.yut.yut_state.append(random.randrange(0, 1 + 1))  # 0, 1을 랜덤으로 받아서 추가
         print(self.yut.yut_state)
 
-    def motion_update(self, mt):  # 윷이 돌아가는 애니메이션(수정 할 계획)
+    # 윷이 돌아가는 애니메이션(수정 할 계획)
+    def motion_update(self, mt):
         self.current_time += mt
         print(self.current_time, self.animation_time)
         # 시간을 늦추는 역할?
         if self.current_time >= self.animation_time:
             self.current_time = 0
-            self.index += 1
+            self.animation_index += 1
             # 윷 사진의 인덱스를 넘어가면 0으로 초기화
-            if self.index >= len(self.yut.yut_images):
-                self.index = 0
-            self.yut.image = self.yut.yut_images[self.index]  # 윷의 이미지는 앞, 우, 뒤, 좌로 돌아감
+            if self.animation_index >= len(self.yut.yut_images):
+                self.animation_index = 0
+            self.yut.image = self.yut.yut_images[self.animation_index]  # 윷의 이미지는 앞, 우, 뒤, 좌로 돌아감
             self.yut.display_yut()  # 윷 4개 화면에 출력
 
-    def show_ending_screen(self):  # 엔딩화면 (재시작과 종료버튼을 다룸)
+    # 엔딩화면 (재시작과 종료버튼을 다룸) (추가 예정)
+    def show_ending_screen(self):
         # 간단한 이벤트 부분 (restart, end 버튼 클릭 이벤트)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -368,9 +388,11 @@ class YutGame(Prototype):
         self.screen.blit(self.restart_button.image,
                          (self.restart_button.x_pos, self.restart_button.y_pos))
 
+    # 버튼 화면에 보이기
     def button_screen_blit(self, button):
         self.screen.blit(button.image, (button.x_pos, button.y_pos))
 
+    # 텍스트 화면에 보이기
     def text_blit(self, text, r, g, b, x, y):
         text_render = self.game_font.render(text, True, (r, g, b))
         text_rect = text_render.get_rect().size

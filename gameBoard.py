@@ -37,14 +37,6 @@ class GameBoard:
     screen_width = 1080  # 스크린 가로
     screen_height = 720  # 스크린 세로
 
-    # 게임 말이 위치에 있으면 1, 2, 3, 4로 업데이트 됨. (어쩌면 사옹 안 할 수도?)
-    board_state = [
-        [0, 0, 0, 0, 0],
-        [0, 0, x, 0, 0],
-        [0, x, 0, x, 0],
-        [0, 0, x, 0, 0],
-        [0, 0, 0, 0, 0]
-    ]
     # 선수 1이 00에 있으면 (4,4)=1, 선수 3이 15에 있으면 (3,2)=3, 선수 4가 16에 있으면 (2,2)=4
     """
     09 08 07 06 04
@@ -67,6 +59,14 @@ class GameBoard:
         self.rect = self.image.get_rect()
         self.rect.left = self.x_pos
         self.rect.top = self.y_pos
+
+        # 게임 말이 위치에 있으면 1, 2, 3, 4로 업데이트 됨.
+        self.board_state = [
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ]
 
 
 if __name__ == "__main__":
