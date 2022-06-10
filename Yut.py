@@ -36,7 +36,7 @@ class Yut(Prototype):
         rslt = 0
         for x in self.yut_state:
             rslt += x
-        print("윷의 결과는 ", rslt)
+        #print("윷의 결과는 ", rslt)
         return rslt
 
     def put_image(self, prompt):  # 윷 객체의 사진을 prompt에 맞는 사진으로 바꿈(앞, 뒤, 오른쪽, 왼쪽)

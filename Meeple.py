@@ -4,6 +4,7 @@ import pygame
 import gameBoard
 from gameBoard import board_map
 
+
 # 게임 말 객체 (다음 칸으로 이동하기, 업기 메소드 포함)
 class Meeple:
     path = os.path.dirname(os.path.abspath(__file__))
@@ -15,15 +16,15 @@ class Meeple:
                 pygame.image.load(path + "/meeple/mipple red1.png"),
                 pygame.image.load(path + "/meeple/mipple red2.png"),
                 pygame.image.load(path + "/meeple/mipple red3.png")],
-        "orange": [pygame.image.load(path+ "/meeple/orange.png"),
+        "orange": [pygame.image.load(path + "/meeple/orange.png"),
                     pygame.image.load(path + "/meeple/mipple orange1.png"),
                    pygame.image.load(path + "/meeple/mipple orange2.png"),
                    pygame.image.load(path + "/meeple/mipple orange3.png")],
-        "yellow": [pygame.image.load(path+ "/meeple/yellow.png"),
+        "yellow": [pygame.image.load(path + "/meeple/yellow.png"),
                    pygame.image.load(path + "/meeple/mipple yellow1.png"),
                    pygame.image.load(path + "/meeple/mipple yellow2.png"),
                    pygame.image.load(path + "/meeple/mipple yellow3.png")],
-        "green": [pygame.image.load(path+ "/meeple/green.png"),
+        "green": [pygame.image.load(path + "/meeple/green.png"),
                   pygame.image.load(path + "/meeple/mipple green1.png"),
                   pygame.image.load(path + "/meeple/mipple green2.png"),
                   pygame.image.load(path + "/meeple/mipple green3.png")],
@@ -40,7 +41,7 @@ class Meeple:
 
     def __init__(self, color="red", pos=0, state=0, sum=1):
         self.color = color  # 내 게임 말의 색깔
-        self.sum = sum  # 업은 수
+        self.sum = sum  # 같은 칸에 존재하는 말의 개수 (업은 수)
         self.pos = pos  # 내가 현재 위치하는 칸
         self.state = state  # 0=아직, 1=보드위, 2=통과
         self.image = self.mipple_images[color][self.sum]
@@ -55,12 +56,73 @@ class Meeple:
 
     # 게임 말 이동 (num 만큼 칸을 이동함) (수정 필요)
     # ex) 도이면 num=1, 윷이면 num=4
-    def move(self, num):
-        self.pos += num
+    def move(self, arrow):
+        self.state = 1
+        if arrow == 0:
+            self.pos += 1
+        elif arrow == 1:
+            self.pos += 1
+        elif arrow == 2:
+            if self.pos == 5:
+                self.pos += 15
+            elif self.pos == 24:
+                self.pos -= 9
+            else:
+                self.pos += 1
+        elif arrow == 3:
+            self.pos += 1
+        elif arrow == 4:
+            if self.pos == 10:
+                self.pos += 15
+            else:
+                self.pos += 1
+        elif arrow == 5:
+            if self.pos == 19:
+                self.pos += 11
+            else:
+                self.pos += 1
+        elif arrow == 6:
+            if self.pos == 15:
+                self.pos += 9
+            elif self.pos == 24:
+                self.pos -= 1
+            elif self.pos == 23:
+                self.pos += 4
+            else:
+                self.pos += 1
+        elif arrow == 7:
+            if self.pos == 22:
+                self.pos += 4
+            elif self.pos == 26:
+                self.pos -= 1
+            elif self.pos == 25:
+                self.pos -= 15
+            else:
+                self.pos += 1
+        elif arrow == 8:
+            if self.pos == 22:
+                self.pos += 6
+            else:
+                self.pos += 1
+        elif arrow == 9:
+            if self.pos == 24:
+                self.pos -= 9
+            else:
+                self.pos += 1
+        elif self.pos == 24:
+            self.pos -= 1
+        elif self.pos == 23:
+            self.pos += 4
+        elif self.pos == 19:
+            self.pos += 11
+        else:
+            self.pos += 1
+
         if self.pos >= len(gameBoard.board_map):
             self.pos = 0
-        self.x_pos = board_map[self.pos][0] - (self.width/2)
-        self.y_pos = board_map[self.pos][1] - (self.height/2)
+            self.state = 2
+        self.x_pos = board_map[self.pos][0] - (self.width / 2)
+        self.y_pos = board_map[self.pos][1] - (self.height / 2)
 
     # 다른 말 업기 (이미지 변경)
     # 기본은 1, 하나 업으면 2, 두개 업으면 3

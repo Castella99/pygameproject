@@ -17,24 +17,30 @@ class Button:
         pygame.image.load(path + "/entity/end button.png"),
         pygame.image.load(path + "/entity/restart button.png"),
         pygame.image.load(path + "/entity/down button.png"),
-        pygame.image.load(path + "/entity/up button.png")
+        pygame.image.load(path + "/entity/up button.png"),
     ]
     # 각 버튼을 딕셔너리로 만듦.
     button_dict = {"red button": 0, "green button": 1, "start button": 2,
                    "help button": 3, "home button": 4, "next button": 5,
                    "end button": 6, "restart button": 7, "down button": 8, 
-                   "up button": 9}
+                   "up button": 9, "up": 10, "down": 11, "left": 12, "right": 13,
+                   "rightup": 14, "leftup": 15, "rightdown": 16, "leftdown": 17}
 
     def __init__(self, prompt, pos1, pos2, pos3, pos4):
         self.image = self.button_images[self.button_dict[prompt]]
         self.size = self.image.get_rect().size
         self.width = self.size[0]
         self.height = self.size[1]
-        self.x_pos = (pos1 * self.screen_width / pos2) - (self.width / 2)
-        self.y_pos = (pos3 * self.screen_height / pos4) - (self.height / 2)
+        self.x_pos = (pos1 * self.screen_width / pos2) - (self.width / 2) -20
+        self.y_pos = (pos3 * self.screen_height / pos4) - (self.height / 2) -25
         self.rect = self.image.get_rect()
         self.rect.left = self.x_pos
         self.rect.top = self.y_pos
+        self.name = prompt
+
+    def set_pos(self, x):
+        self.x_pos = x[0] - (self.width / 2)
+        self.y_pos = x[1] - (self.height / 2)
 
     def change_location(self, pos1, pos2, pos3, pos4):
         self.x_pos = (pos1 * self.screen_width / pos2) - (self.width / 2)

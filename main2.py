@@ -23,9 +23,18 @@ while True:
     # 게임 중
     game.set_order()  # 게임 순서 정하기
     while game.screen_game:
-        game.main_events()  # 게임 이벤트 (게임 말 이동, 플레이어 순서 추가 예정)
-        game.show_game_screen()  # 화면그리기 (보드판, 게임 말 추가예정)
-        pygame.display.update()
+        for player in game.order:
+            print("player"+str(1 + game.order.index(player)))
+            while True:
+                is_stop = game.game_process(player)
+                if is_stop:
+                    break
+                elif not game.screen_game:
+                    break
+            if not game.screen_game:
+                break
+
+
 
     # 끝 부분
     while game.screen_ending:
