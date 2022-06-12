@@ -4,6 +4,8 @@ import Meeple
 
 # 플레이어 객체
 class Player:
+    # 플레이어 순위
+    score = 1
     x_pos = 0  # 객체의 x좌표
     y_pos = 0  # 객체의 y좌표
     pos = (x_pos, y_pos)  # 객체의 좌표 튜플
@@ -35,3 +37,12 @@ class Player:
         if self.num == cnt:
             return True
         return  False
+
+    # 남은 말의 개수가 없으면 True
+    def check_done(self):
+        for meeple in self.meeples:
+            print("게임말의 상태: ", meeple.state)
+            if meeple.state != 2:
+                return False
+        print("True 리턴")
+        return True

@@ -1,3 +1,4 @@
+import Player
 import YutGame2
 import pygame
 
@@ -23,6 +24,7 @@ while True:
     # 게임 중
     game.set_order()  # 게임 순서 정하기
     while game.screen_game:
+        is_finish = 0
         for player in game.order:
             print("player"+str(1 + game.order.index(player)))
             while True:
@@ -33,15 +35,28 @@ while True:
                     break
             if not game.screen_game:
                 break
-
-
+        # 플레이어가 모두 빠져나왔을때 (All player.state != 0)
+        for player in game.order:
+            if player.state != 0:
+                is_finish += 1
+            if player.state == 1:
+                game.winner = "player" + str(game.order.index(player)+1)
+        if is_finish >= len(game.order)-1 and len(game.order) != 1:
+            game.screen_ending = True
+            game.screen_game = False
+        elif len(game.order) == 1 and is_finish == len(game.order):
+            game.screen_ending = True
+            game.screen_game = False
 
     # 끝 부분
+    for p in game.order:
+        print("player"+ str(game.order.index(p)+1) +"은", p.state, "등")
     while game.screen_ending:
         game.show_ending_screen()  # 끝 부분 이벤트와 화면그리기 (승자 패자 화면 출력 추가 예정)
         pygame.display.update()
     if not game.running:
         break
     del game
+    Player.Player.score = 0
 pygame.quit()
 

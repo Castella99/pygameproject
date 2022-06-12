@@ -43,7 +43,7 @@ class Arrow:
         # state False=해당 없음 / True=화면에 표시해야 함
         self.state = state
         # 몇번째 meeple의 화살표인지(idx)
-        self.who = 0
+        self.who = -1
 
     def set_state(self, state):
         self.state = state

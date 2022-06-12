@@ -30,7 +30,8 @@ class Meeple:
         "purple": [pygame.image.load(path + "/meeple/mipple purple1.png"),
                    pygame.image.load(path + "/meeple/mipple purple2.png"),
                    pygame.image.load(path + "/meeple/mipple purple3.png")],
-        "void": [pygame.image.load(path + "/meeple/void.png")]
+        "void": [pygame.image.load(path + "/meeple/void.png"),
+                 pygame.image.load(path + "/meeple/void2.png"),]
     }
 
     def __init__(self, color="red", pos=0, state=0, sum=0):
@@ -38,6 +39,7 @@ class Meeple:
         self.sum = sum  # (업은 수)
         self.pos = pos  # 내가 현재 위치하는 칸
         self.state = state  # 0=아직, 1=보드위, 2=통과, 3=업힘
+
         self.image = self.mipple_images[color][self.sum]
         self.size = self.image.get_rect().size
         self.width = self.size[0]
@@ -45,12 +47,17 @@ class Meeple:
         self.x_pos = board_map[self.pos][0] - (self.width / 2)
         self.y_pos = board_map[self.pos][1] - (self.height / 2)
         self.rect = self.image.get_rect()
-        self.rect.left = self.x_pos
-        self.rect.top = self.y_pos
+        self.rect.left = self.x_pos - 30
+        self.rect.top = self.y_pos - 30
 
     # 게임 말 이동 (num 만큼 칸을 이동함) (수정 필요)
     # ex) 도이면 num=1, 윷이면 num=4
     def move(self, arrow):
+        # 게임 말이 보드판을 완주하면
+        if self.state == 2 or self.pos >= len(gameBoard.board_map)-2:
+            self.state = 2
+            return
+
         if arrow == 0:
             self.pos += 1
         elif arrow == 1:
@@ -104,17 +111,12 @@ class Meeple:
                 self.pos += 1
         elif arrow == -1:
             if self.pos == 24:
-                self.pos -= 1
-            elif self.pos == 23:
-                self.pos += 4
+                self.pos -= 9
             elif self.pos == 19:
                 self.pos += 11
             else:
                 self.pos += 1
 
-        if self.pos >= len(gameBoard.board_map):
-            self.pos = 0
-            self.state = 2
         self.x_pos = board_map[self.pos][0] - (self.width / 2)
         self.y_pos = board_map[self.pos][1] - (self.height / 2)
         self.state = 1
@@ -125,10 +127,16 @@ class Meeple:
         self.sum += 1
         self.image = self.mipple_images[self.color][self.sum]
 
+    # 게임말 선택 화면에서 사용함.
     def set_rect(self):
         self.rect = self.image.get_rect()
         self.rect.left = self.x_pos
         self.rect.top = self.y_pos
+
+    # process4 말 선택할때 사용
+    def set_left_top(self):
+        self.rect.left = self.x_pos - 30
+        self.rect.top = self.y_pos - 30
 
     def set_void(self):
         self.image = self.mipple_images["void"][0]
@@ -137,6 +145,7 @@ class Meeple:
         self.sum -= 1
         self.image = self.mipple_images[self.color][self.sum]
 
+    # 보드 옆 상태창에 게임말 표시할 때 사용
     def set_pos(self, x, y):
         self.x_pos = x
         self.y_pos = y
