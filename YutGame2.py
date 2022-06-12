@@ -1,5 +1,4 @@
-import time
-
+import Arrow
 from Prototypegame import*
 import Yut
 import gameBoard
@@ -23,13 +22,17 @@ class YutGame(Prototype):
         self.running = True
         self.push = False
 
+        # 세팅에 필요한 변수들
+        self.player_text = None
+        self.computer_text = None
+        self.meeple_num = None
+
         # 현재 게임 상태가 어떤지 확인 하는 변수
         self.screen_title = True
         self.screen_setting = False
         self.screen_meeple = False
         self.screen_game = False
         self.screen_ending = False
-
 
         # 현재 어떤 버튼이 눌렸나 확인하는 변수들
         self.button_home = True
@@ -58,7 +61,6 @@ class YutGame(Prototype):
         self.computer_mee_list = [1, 2, 3, 4, 5, 6]
         self.setcomputer = True
         self.order = []  # 플레이어 총 순서
-        self.meeple_move = False  # 윷을 던지고 말을 움직이게 하는 변수
         self.order_idx = 0  # 현재 순번의 말
         self.yut_rst = 0  # 윳 던진 결과
         self.screen_mee_list = []  # 스크린상에 표시되어야할 말
@@ -70,12 +72,12 @@ class YutGame(Prototype):
 
         # 게임 진행 로직에 필요한 변수
         self.is_gp1 = True  # 게임 보드 화면: next 버튼을 눌러 윷화면으로 이동 (-> gp2)
-        self.is_gp2 = False  # 게임 윷 화면: green버튼을 눌러 윷을 던짐 그리고 보드 화면으로 다시 이동 (-> gp3)
-        self.is_gp3 = False  # 게임 보드 화면: 윷의 결과만큼 말을 이동 (-> gp4)
-        self.is_gp4 = False  # 게임 보드 화면: 한번 더 할 지 턴을 넘길지 결정(break or -> gp2)
-        self.is_gp5 = False  # 게임 보드 화면: 이동시킬 말 선택 (-> gp3)
-        # base: p1 -> p2 -> p3 -> p4 -> break
-        # case2: 한번더 하는 경우     ㄴ> p2 -> p5 -> p3 -> p4
+        self.is_gp2 = False  # 게임 윷 화면: green버튼을 눌러 윷을 던짐 그리고 보드 화면으로 다시 이동 (-> gp4)
+        self.is_gp3 = False  # 게임 보드 화면: 이동시킬 말 선택 (-> gp4)
+        self.is_gp4 = False  # 게임 보드 화면: 윷의 결과만큼 말을 이동 (-> gp5)
+        self.is_gp5 = False  # 게임 보드 화면: 한번 더 할 지 턴을 넘길지 결정(break or -> gp2)
+        # base: p1 -> p2 -> p3 -> p4 -> p5 -> break
+        # case2: 한번더 하는 경우           ㄴ> p2 -> p3 -> p4 -> p5
         self.is_again = False
 
         # 윷과 윷판 객체
@@ -84,14 +86,13 @@ class YutGame(Prototype):
 
         self.animation_time = round(100 / len(self.yut.yut_images * 100), 2)
 
-
         # 각종 버튼 객체
         self.start_button = Button.Button("start button", 1, 2, 2, 3)
         self.help_button = Button.Button("help button", 1, 2, 7, 8)
         self.home_button = Button.Button("home button", 8, 10, 1, 6)
-        self.red_button = Button.Button("red button", 1, 2, 7, 9)
-        self.green_button = Button.Button("green button", 1, 2, 7, 9)
-        self.next_button = Button.Button("next button", 8, 9, 6, 7)
+        self.red_button = Button.Button("red button", 1, 2, 9, 11)
+        self.green_button = Button.Button("green button", 1, 2, 9, 11)
+        self.next_button = Button.Button("next button", 8, 9, 9, 10)
         self.next_button_up = Button.Button("next button", 8, 9, 1, 7)
         self.restart_button = Button.Button("restart button", 1, 2, 2, 3)
         self.end_button = Button.Button("end button", 1, 2, 7, 8)
@@ -102,11 +103,34 @@ class YutGame(Prototype):
         self.down_button3 = Button.Button("down button", 7, 12, 7, 9)
         self.up_button3 = Button.Button("up button", 4, 5, 7, 9)
 
+        # 이동 방향 객체
+        self.arrow = [
+            Arrow.Arrow("up", Arrow.arrow_map[1]), Arrow.Arrow("left", Arrow.arrow_map[6]),
+            Arrow.Arrow("leftdown", Arrow.arrow_map[20]), Arrow.Arrow("down", Arrow.arrow_map[11]),
+            Arrow.Arrow("rightdown", Arrow.arrow_map[25]), Arrow.Arrow("right", Arrow.arrow_map[16]),
+            Arrow.Arrow("rightup", Arrow.arrow_map[24]), Arrow.Arrow("leftup", Arrow.arrow_map[26]),
+            Arrow.Arrow("rightdown", Arrow.arrow_map[28]), Arrow.Arrow("leftdown", Arrow.arrow_map[23])
+        ]
+
         for color in self.meeple_color_list:
             self.meeple_button_list.append(Meeple.Meeple(color, 0, 0, 0))
 
+
+
     def __del__(self):
         print("게임이 제거 되었습니다.")
+
+    # 버튼 화면에 표시 함수
+    def button_screen_blit(self, button):
+        self.screen.blit(button.image, (button.x_pos, button.y_pos))
+
+    # 텍스트 출력 함수
+    def text_blit(self, text, RGB, x, y):
+        text_render = self.game_font.render(text, True, (RGB[0], RGB[1], RGB[2]))
+        text_rect = text_render.get_rect().size
+        text_width = text_rect[0]
+        text_height = text_rect[1]
+        self.screen.blit(text_render, (x - text_width / 2, y - text_height / 2))
 
     # 시작 화면 (규칙 설명으로 이동하고 다시 돌아 올 수 있음)
     def show_title_screen(self):
@@ -152,7 +176,7 @@ class YutGame(Prototype):
                 self.screen_setting = False
                 self.screen_ending = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # 시작버튼 누르면 중간부분(game_screen)의 보드판 화면으로 넘어감
+                # 사람의 수 결정
                 if self.down_button1.rect.collidepoint(event.pos):
                     if self.num_of_player == 1:
                         self.num_of_player = 1
@@ -163,6 +187,7 @@ class YutGame(Prototype):
                         pass
                     else:
                         self.num_of_player += 1
+                # 컴퓨터의 수 설정
                 elif self.down_button2.rect.collidepoint(event.pos):
                     if self.num_of_computer == 0:
                         self.num_of_computer = 0
@@ -173,6 +198,7 @@ class YutGame(Prototype):
                         pass
                     else:
                         self.num_of_computer += 1
+                # 게임말 개수 설정
                 elif self.down_button3.rect.collidepoint(event.pos):
                     if self.num_of_meeple == 0:
                         self.num_of_meeple = 0
@@ -183,14 +209,23 @@ class YutGame(Prototype):
                         pass
                     else:
                         self.num_of_meeple += 1
+                # meeple 색 결정하는 화면으로 넘어감
                 elif self.next_button_up.rect.collidepoint(event.pos):
                     self.button_setting = False
                     self.screen_setting = False
                     self.screen_meeple = True
                     self.button_meeple = True
-                    for i in range(self.num_of_player) :
-                        self.screen_mee_list.append([]) # 플레이어 수만큼 리스트 추가
-
+                    for i in range(self.num_of_player):
+                        self.screen_mee_list.append([])  # 플레이어 수만큼 리스트 추가
+                    for i in range(self.num_of_computer):
+                        self.screen_mee_list.append([])  # 플레이어 수만큼 리스트 추가
+                    # 필요없는 메모리 절약
+                    del self.up_button1
+                    del self.up_button2
+                    del self.up_button3
+                    del self.down_button1
+                    del self.down_button2
+                    del self.down_button3
         # 화면 그리기
         self.player_text = self.game_font.render(str(self.num_of_player), True, (0, 0, 0))
         self.computer_text = self.game_font.render(str(self.num_of_computer), True, (0, 0, 0))
@@ -247,11 +282,11 @@ class YutGame(Prototype):
                 entity.set_rect()
 
             if self.init_text == self.num_of_player:
-                self.text_blit("player의 말을 골라주세요!", 255, 100, 100, self.screen_width / 2, 200)
+                self.text_blit("player의 말을 골라주세요!", (255, 100, 100), self.screen_width / 2, 200)
             elif self.init_text != 0:
-                self.text_blit(str(self.init_text) + "명 더 골라주세요!", 255, 100, 100, 540, 200)
-            else :
-                self.text_blit("말을 모두 골랐습니다! 다음으로 넘어가주세요.", 255, 100, 100, 540, 200)
+                self.text_blit(str(self.init_text) + "명 더 골라주세요!", (255, 100, 100), 540, 200)
+            else:
+                self.text_blit("말을 모두 골랐습니다! 다음으로 넘어가주세요.", (255, 100, 100), 540, 200)
                 self.next_board = True
                 if self.setcomputer :
                     com_mee_idx_list = random.sample(self.computer_mee_list, self.num_of_computer)
@@ -273,9 +308,7 @@ class YutGame(Prototype):
                     self.running = False
                 # 다시시작 버튼을 누르면 시작부분(title_screen)의 시작화면으로 넘어감
                 elif self.restart_button.rect.collidepoint(event.pos):
-                    self.screen_ending = False; self.screen_title = True
-                    self.button_home = True; self.button_help = False; self. button_board = False
-                    self.button_table = False; self.button_green = False; self.push = False
+                    self.screen_ending = False
 
         # 화면 출력 부분(끝배경, 종료버튼, 다시시작버튼)
         victory_text = "우승자는 " + self.winner + "!!!"
@@ -284,10 +317,12 @@ class YutGame(Prototype):
                          (self.end_button.x_pos, self.end_button.y_pos))
         self.screen.blit(self.restart_button.image,
                          (self.restart_button.x_pos, self.restart_button.y_pos))
-        self.text_blit(victory_text, 0, 0, 0, 540, 100)
+        self.text_blit(victory_text, (0, 0, 0), 540, 100)
 
+    # player 순서를 랜덤으로 정함.
     def set_order(self):
-        while len(self.computer_list)+len(self.player_list) != 0: # 컴퓨터 리스트의 길이와 플레이어 리스트의 길이의 합이 0 아니면
+        # 컴퓨터 리스트의 길이와 플레이어 리스트의 길이의 합이 0 아니면
+        while len(self.computer_list)+len(self.player_list) != 0:
             i = random.randrange(2)
             if i == 0 and len(self.computer_list) != 0:
                 print(len(self.computer_list))
@@ -298,209 +333,145 @@ class YutGame(Prototype):
                 j = random.randrange(len(self.player_list))
                 self.order.append(self.player_list[j])
                 del self.player_list[j]
+        # 보드 옆에 둘 게임말 상태창 리스트 초기화
         for i in self.order:
-            self.mee_button.append(Meeple.Meeple(i.meeples[self.num_of_meeple].color, sum=self.num_of_meeple))
+            self.mee_button.append(Meeple.Meeple(i.meeples[self.num_of_meeple-1].color, sum=0))
 
-    def game_process(self):
-        if self.is_gp1:
-            self.process1()
-        elif self.is_gp2:
-            self.process2()
-        elif self.is_gp3:
-            self.process3()
-        elif self.is_gp4:
-            prompt = self.process4()
-            if prompt == "finish":
-                return True
-        pygame.display.update()
-
-    # 게임 첫 화면: 윷 화면으로 넘어간다.
-    def process1(self):
-        #print("p1")
-        # 보드판 화면 구현 함수
-        self.board_screen_blit()
-
-        # 사용자 이벤트
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.screen_game = False
-                self.screen_ending = True
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.next_button.rect.collidepoint(event.pos):  # 다음 버튼 눌렀을 때 보드판으로 이동
-                    self.is_gp1 = False
-                    self.is_gp2 = True
-
-    def process2(self):
-        #print("p2")
-        self.screen.blit(self.background.put_image("table"), (0, 0))
-        self.screen.blit(self.green_button.image,
-                         (self.green_button.x_pos, self.green_button.y_pos))
-        self.yut.display_yut()
-        self.text_blit("버튼을 한번만 누르세요", 250, 250, 250, 540, 680)
-        if self.button_green:  # 윷 던지기(스페이스바)를 눌렀을 때
-            if self.push:  # 스페이스바를 누르고 있을 때 윷 애니메이션 작동
-                self.button()
-                self.motion_update(60)
-            else:  # 스페이스바를 뗐을 때 결과 출력
-                # 윷 결과 1.5초동안 보여주기
-                self.main_delay(1.5)
-                self.yut_rst = self.yut.result()
-                self.button_green = False
-                self.meeple_move = True
-                self.is_gp2 = False
-                self.is_gp3 = True
-
-        # 사용자 이벤트
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.screen_game = False
-                self.screen_ending = True
-                self.is_gp2 = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.green_button.rect.collidepoint(event.pos):
-                    self.button_green = True
-                    self.push = True
-            elif event.type == pygame.MOUSEBUTTONUP:  # 윷 돌리기
-                self.push = False
-
-    def process3(self):
-        #print("p3")
-        if self.meeple_move:  # 윷을 던진 결과를 보드에 적용
-            self.move_meeple()
-            self.meeple_move = False
-            self.is_gp3 = False
-            self.is_gp4 = True
-
-        # 사용자 이벤트
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.screen_game = False
-                self.screen_ending = True
-                self.is_gp3 = False
-
-    def process4(self):
-        #print("p4")
-        if self.yut_rst == 0 or self.yut_rst == 4:
-            self.is_gp4 = False
-            self.is_gp2 = True
-            self.button_green = True
-        else:
-            self.is_gp4 = False
-            self.is_gp1 = True
-            return "finish"
-
-        # 사용자 이벤트
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.screen_game = False
-                self.screen_ending = True
-                self.is_gp4 = False
-
-    # 메인 이벤트
-    def main_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # 종료
-                self.screen_game = False
-                self.screen_ending = True
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.next_button.rect.collidepoint(event.pos) and self.button_board:  # 다음 버튼 눌렀을 때 보드판으로 이동
-                    self.button_board = False
-                    self.button_table = True
-                # 그린 버튼 눌렀을 때 윷 돌리기
-                if self.green_button.rect.collidepoint(event.pos) and self.button_table:
-                    self.button_green = True
-                    self.push = True
-                # 우측 말 판 표시기
-                for i, mee in enumerate(self.mee_button):
-                    if mee.rect.collidepoint(event.pos) and self.button_board and self.order_idx == i and \
-                            self.order[self.order_idx].board_num < self.num_of_meeple and \
-                            len(self.screen_mee_list[self.order_idx]) != 0:
-                        self.mee_button[i].minus_sum()
-                        self.order[self.order_idx].board_num += 1
-                        self.screen_mee_list[self.order_idx].append(
-                            self.order[self.order_idx].meeples[self.order[self.order_idx].board_num])
-
-            elif event.type == pygame.MOUSEBUTTONUP:  # 윷 돌리기
-                self.push = False
-            elif event.type == pygame.KEYDOWN:  # 키보드 입력
-                if event.key == pygame.K_SPACE and self.button_table:
-                    self.button_green = True
-                    self.push = True
-                if event.key == pygame.K_SPACE and self.button_board:
-                    self.button_board = False
-                    self.button_table = True
-            elif event.type == pygame.KEYUP and self.button_table:
-                self.push = False
-
-    # 게임 화면(윷놀이가 진행될 때의 화면)
-    def show_game_screen(self):
-        if self.button_board:
-            self.board_screen_blit()  # 보드판 화면 구현 함수
-            if self.meeple_move:  # 윷을 던진 결과를 보드에 적용
-                self.move_meeple()
-                self.meeple_move = False
-
-        elif self.button_table:  # 윷 테이블로 이동하기 버튼 눌렀을 때
-            self.screen.blit(self.background.put_image("table"), (0, 0))
-            self.screen.blit(self.green_button.image,
-                             (self.green_button.x_pos, self.green_button.y_pos))
-            self.yut.display_yut()
-            self.text_blit("버튼을 한번만 누르세요", 250, 250, 250, 540, 680)
-            if self.button_green:  # 윷 던지기(스페이스바)를 눌렀을 때
-                if self.push:  # 스페이스바를 누르고 있을 때 윷 애니메이션 작동
-                    self.button()
-                    self.motion_update(60)
-                else:  # 스페이스바를 뗐을 때 결과 출력
-                    self.main_delay(1)  # 윷 결과 1초동안 보여주기
-                    self.yut_rst = self.yut.result()
-                    self.button_table = False
-                    self.button_board = True
-                    self.button_green = False
-                    self.meeple_move = True
-
-    def board_screen_blit(self):  # 보드 화면 출력
+    # 보드 화면 출력
+    def board_screen_blit(self, player):
+        idx = self.order.index(player)
         self.yut.yut_state_reset()  # 윷을 모두 앞으로 리셋
         self.screen.blit(self.background.put_image("board"), (0, 0))
         self.screen.blit(self.next_button.image,
                          (self.next_button.x_pos, self.next_button.y_pos))
         self.screen.blit(self.yut_board.image,
                          (self.yut_board.x_pos, self.yut_board.y_pos))
+
+        # 보드판 옆에 게임 상태 보여주기
         for i, player_mee in enumerate(self.order):
-            self.text_blit("{}번".format(i + 1), 0, 0, 0, 855, 45 + 90 * i)
-            self.mee_button[i].set_pos(945, 45+90*i)
+            self.text_blit("{}번".format(i + 1), (0, 0, 0), 855, 45 + 90 * i)
+            self.mee_button[i].set_pos(945, 45 + 90 * i)
             self.meeple_screen_blit(self.mee_button[i])
-        if self.order_idx >= len(self.order):
-            self.order_idx = 0
-        self.text_blit("<-", 255, 0, 0, 1035, 45+90*self.order_idx)
-        for screen_player in self.screen_mee_list:  # 보드판 위 말 화면에 출력
-            for screen_mee in screen_player:
-                self.meeple_screen_blit(screen_mee)
-        if len(self.screen_mee_list[self.order_idx]) != 0:
-            self.meeple_screen_blit(self.screen_mee_list[self.order_idx][0])
+        self.text_blit("<-", (255, 0, 0), 1035, 45 + 90 * idx)
 
-    def button_screen_blit(self, button):  # 버튼 화면에 표시 함수
-        self.screen.blit(button.image, (button.x_pos, button.y_pos))
+        # 보드판 위 말 화면에 출력: meeple의 상태가 1인것만 화면에 출력
+        for player in self.order:
+            for meeple in player.meeples:
+                if meeple.state == 1:
+                    self.meeple_screen_blit(meeple)
 
-    def text_blit(self, text, r, g, b, x, y):  # 텍스트 출력 함수
-        text_render = self.game_font.render(text, True, (r, g, b))
-        text_rect = text_render.get_rect().size
-        text_width = text_rect[0]
-        text_height = text_rect[1]
-        self.screen.blit(text_render, (x - text_width / 2, y - text_height / 2))
+        # 이동가능한 화살표 표시
+        if self.is_gp3:
+            self.show_arrow()
+        # 컴퓨터가 하는 중
+        if type(player) is Computer.Computer:
+            self.text_blit("컴퓨터가 하는 중...", Computer.Computer.color_list[player.color], 180, 40)
 
-    def meeple_screen_blit(self, mee):  # 말 화면에 나타내기 함수
-        self.screen.blit(mee.image, (mee.x_pos - mee.width/2, mee.y_pos - mee.height/2))
+    # 말 화면에 나타내기 함수
+    def meeple_screen_blit(self, mee):
+        self.screen.blit(mee.image, (mee.x_pos - mee.width / 2, mee.y_pos - mee.height / 2))
 
-    def main_delay(self, sec):  # 딜레이 함수
-        temp_ticks = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - temp_ticks <= sec*1000:
-            self.screen.blit(self.background.put_image("table"), (0, 0))
-            self.screen.blit(self.red_button.image,
-                             (self.red_button.x_pos, self.red_button.y_pos))
-            self.text_blit("참 잘했어요^^", 250, 250, 250, 540, 680)
-            self.yut.display_yut()
-            self.yut.result()
-            pygame.display.update()
+    def game_process(self, player):
+        if self.is_gp1:
+            self.process1(player)
+        elif self.is_gp2:
+            self.process2(player)
+        elif self.is_gp4:
+            self.process4(player)
+        elif self.is_gp5:
+            prompt = self.process5(player)
+            if prompt == "finish":
+                return True
+        elif self.is_gp3:
+            self.process3(player)
+        pygame.display.update()
+
+    # 게임 첫 화면: 윷 화면으로 넘어간다.
+    def process1(self, player):
+        # 사용자 이벤트
+        if type(player) is Player.Player:
+            self.board_screen_blit(player)
+            for event in pygame.event.get():
+                # 종료
+                if event.type == pygame.QUIT:
+                    self.screen_game = False
+                    self.screen_ending = True
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    print(self.next_button.rect, event.pos)
+                    # 다음 버튼 눌렀을 때 보드판으로 이동
+                    if self.next_button.rect.collidepoint(event.pos):
+                        self.is_gp1 = False
+                        self.is_gp2 = True
+                elif event.type == pygame.KEYDOWN:  # 키보드 입력
+                    # 스페이스바 눌러도 보드판으로 이동
+                    if event.key == pygame.K_SPACE:
+                        self.is_gp1 = False
+                        self.is_gp2 = True
+        # 컴퓨터가 하는 중
+        else:
+            sec = 1
+            temp_ticks = pygame.time.get_ticks()
+            while pygame.time.get_ticks() - temp_ticks <= sec * 1000:
+                self.board_screen_blit(player)
+            self.is_gp1 = False
+            self.is_gp2 = True
+
+    # 윷 던지기
+    def process2(self, player):
+        # 사용자 이벤트
+        if type(player) is Player.Player:
+            self.table_screen_blit(player)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.screen_game = False
+                    self.screen_ending = True
+                    self.is_gp2 = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.green_button.rect.collidepoint(event.pos):
+                        self.button_green = True
+                        self.push = True
+                elif event.type == pygame.MOUSEBUTTONUP:  # 윷 돌리기
+                    self.push = False
+                elif event.type == pygame.KEYDOWN:  # 키보드 입력
+                    if event.key == pygame.K_SPACE:
+                        self.button_green = True
+                        self.push = True
+                elif event.type == pygame.KEYUP:
+                    self.push = False
+        # 컴퓨터가 하는 중
+        else:
+            sec = 1
+            temp_ticks = pygame.time.get_ticks()
+            self.button_green = True
+            self.push = True
+            while pygame.time.get_ticks() - temp_ticks <= sec * 1000:
+                self.table_screen_blit(player)
+            self.push = False
+            self.table_screen_blit(player)
+        self.reset_arrow_idx()
+
+    def table_screen_blit(self, player):
+        self.screen.blit(self.background.put_image("table"), (0, 0))
+        self.screen.blit(self.green_button.image,
+                         (self.green_button.x_pos, self.green_button.y_pos))
+        self.yut.display_yut()
+        self.text_blit("버튼을 한번만 누르세요", (250, 250, 250), 540, 680)
+        # 윷 던지기(스페이스바)를 눌렀을 때
+        if self.button_green:
+            # 스페이스바를 누르고 있을 때 윷 애니메이션 작동
+            if self.push:
+                if type(player) is Computer.Computer:
+                    self.text_blit("컴퓨터가 하는 중...", Computer.Computer.color_list[player.color], 180, 40)
+                self.button()
+                self.motion_update(60)
+            # 스페이스바를 뗐을 때 결과 출력
+            else:
+                # 윷 결과 1.5초동안 보여주기
+                self.main_delay(1.5, player)
+                self.yut_rst = self.yut.result()
+                self.button_green = False
+                self.is_gp2 = False
+                self.is_gp3 = True
 
     def button(self):  # 윷 던지기(윷의 상태를 랜덤으로 생성 함)
         self.yut.yut_state.clear()  # 윷 상태 리스트 초기화
@@ -520,38 +491,227 @@ class YutGame(Prototype):
             self.yut.image = self.yut.yut_images[self.index]  # 윷의 이미지는 앞, 우, 뒤, 좌로 돌아감
             self.yut.display_yut()  # 윷 4개 화면에 출력
 
-    # 한 칸씩 움직이기
-    def move_meeple_sec(self, move, mee):
+    # 윷을 던지고 난 후 애니메이션
+    def main_delay(self, sec, player):
+        temp_ticks = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - temp_ticks <= sec*1000:
+            self.screen.blit(self.background.put_image("table"), (0, 0))
+            self.screen.blit(self.red_button.image,
+                             (self.red_button.x_pos, self.red_button.y_pos))
+            self.text_blit("참 잘했어요^^", (250, 250, 250), 540, 680)
+            self.yut.display_yut()
+            self.yut.result()
+            # 컴퓨터가 하는 중
+            if type(player) is Computer.Computer:
+                self.text_blit("컴퓨터가 하는 중...", Computer.Computer.color_list[player.color], 180, 40)
+            pygame.display.update()
+
+    def reset_arrow_idx(self):
+        for arrow in self.arrow:
+            arrow.who = 0
+
+    # 어떤 게임말 어디로 이동할지 선택
+    def process3(self, player):
+        self.board_screen_blit(player)
+        # 가능한 화살표 다 보이기
+        for idx in range(player.num):
+            if player.meeples[idx].state == 0 or player.meeples[idx].state == 1:
+                if player.meeples[idx].pos == 0:
+                    if player.check_state():
+                        pass
+                    else:
+                        self.arrow[0].set_arrow(True,idx)
+                elif player.meeples[idx].pos == 5:
+                    self.arrow[1].set_arrow(True,idx)
+                    self.arrow[2].set_arrow(True, idx)
+                elif player.meeples[idx].pos == 10:
+                    self.arrow[3].set_arrow(True,idx)
+                    self.arrow[4].set_arrow(True, idx)
+                elif player.meeples[idx].pos == 15:
+                    self.arrow[5].set_arrow(True,idx)
+                    self.arrow[6].set_arrow(True, idx)
+                elif player.meeples[idx].pos == 22:
+                    self.arrow[7].set_arrow(True,idx)
+                    self.arrow[8].set_arrow(True, idx)
+                    self.arrow[9].set_arrow(True, idx)
+                elif player.meeples[idx].pos == 27:
+                    self.arrow[8].set_arrow(True,idx)
+        #사용자 이벤트
+        if type(player) is Player.Player:
+            for event in pygame.event.get():
+                # 종료
+                if event.type == pygame.QUIT:
+                    self.screen_game = False
+                    self.screen_ending = True
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # 화살표를 누른 경우
+                    for arrow in self.arrow:
+                        if arrow.rect.collidepoint(event.pos) and arrow.state:
+                            player.idx = arrow.who
+                            # 고른 것만 true로 만들기
+                            for i in self.arrow:
+                                i.state = False
+                            self.arrow[self.arrow.index(arrow)].state = True
+                            self.is_gp3 = False
+                            self.is_gp4 = True
+                            break
+                    # 게임말을 누른 경우
+                    for meeple in player.meeples:
+                        if meeple.state == 1 and meeple.rect.collidepoint(event.pos):
+                            player.idx = player.meeples.index(meeple)
+                            # arrow 모두 false로 만들기
+                            for i in self.arrow:
+                                i.state = False
+                            self.is_gp3 = False
+                            self.is_gp4 = True
+        # 컴퓨터가 하는 중
+        else:
+            self.choose_arrow(player)
+
+    def choose_arrow(self, player):
+        temp_list = []
+        # 만약 내가 정 가운데 칸에 있으면 무조건 골인 지점으로 감.
+        for meeple in player.meeples:
+            if meeple.pos == 22:
+                player.idx = player.meeples.index(meeple)
+                for arrow in self.arrow:
+                    arrow.state = False
+                self.arrow[8].state = True
+                self.is_gp3 = False
+                self.is_gp4 = True
+                return
+        # 아니면 내가 있는 위치에서 갈 수 있는 방향을 랜덤으로 감.
+        for i in self.arrow:
+            if i.state:
+                temp_list.append(self.arrow.index(i))
+            i.state = False
+        # 정해져 있으면 그냥 정해진대로 감.
+        if len(temp_list) == 0:
+            for arrow in self.arrow:
+                arrow.state = False
+            # 움직일 meeple을 정함
+            meeple_list = []
+            for meeple in player.meeples:
+                if meeple.state == 1:
+                    meeple_list.append(player.meeples.index(meeple))
+            player.idx = random.choice(meeple_list)
+            self.is_gp3 = False
+            self.is_gp4 = True
+            return
+        # 침착하게 1초 기다림.
+        sec = 1
+        temp_ticks = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - temp_ticks <= sec * 1000:
+            self.board_screen_blit(player)
+
+            pygame.display.update()
+        print(temp_list)
+        for arrow in self.arrow:
+            arrow.state = False
+        arrow = random.choice(temp_list)
+        self.arrow[arrow].state = True
+        player.idx = self.arrow[arrow].who
+        self.is_gp3 = False
+        self.is_gp4 = True
+
+
+    # 선택한 게임 말 이동하기
+    def process4(self, player):
+        # 윷을 던진 결과를 보드에 적용
+        self.move_meeple(player)
+        self.is_gp4 = False
+        self.is_gp5 = True
+        # 사용자 이벤트
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.screen_game = False
+                self.screen_ending = True
+                self.is_gp4 = False
+
+    # 화면상에서 말 움직이기 함수; 윷의 결과만큼 이동시킴. + 업기 잡기 결정
+    def move_meeple(self, player):
+        # 현재 자기가 있는 칸은 -1로 바꿈
+        self.yut_board.board_state[player.meeples[player.idx].pos][0] = -1
+        self.yut_board.board_state[player.meeples[player.idx].pos][1] = -1
+        idx = self.order.index(player)
+        if self.yut_rst == 1:
+            self.move_meeple_sec(1, self.order[idx].meeples[player.idx], player)
+        elif self.yut_rst == 2:
+            self.move_meeple_sec(2, self.order[idx].meeples[player.idx], player)
+        elif self.yut_rst == 3:
+            self.move_meeple_sec(3, self.order[idx].meeples[player.idx], player)
+        elif self.yut_rst == 4:
+            self.move_meeple_sec(4, self.order[idx].meeples[player.idx], player)
+        elif self.yut_rst == 0:
+            self.move_meeple_sec(5, self.order[idx].meeples[player.idx], player)
+        print(self.yut_board.board_state)
+
+    # 한 칸씩 움직이기; player의 움직일 meeple을 move만큼 이동시킴.
+    def move_meeple_sec(self, move, mee, player):
         for i in range(move):
             temp_ticks = pygame.time.get_ticks()
             while pygame.time.get_ticks() - temp_ticks <= 500:
-                self.board_screen_blit()
+                self.board_screen_blit(player)
                 pygame.display.update()
-            mee.move(1)
+            mee.move(self.check_arrow())
 
-    # 화면상에서 말 움직이기 함수
-    def move_meeple(self):
-        if self.order[self.order_idx].board_num == 0:
-            self.screen_mee_list[self.order_idx].append(self.order[self.order_idx].meeples[1])
-            self.order[self.order_idx].board_num += 1
-            self.meeple_screen_blit(self.screen_mee_list[self.order_idx][0])
-            self.mee_button[self.order_idx].minus_sum()
+    # 선택한 arrow가 무엇인지 확인
+    def check_arrow(self):
+        for i in self.arrow:
+            if i.state:
+                return self.arrow.index(i)
+        return -1
 
-        if self.yut_rst == 1:
-            self.move_meeple_sec(1, self.order[self.order_idx].meeples[1])
-            self.order_idx += 1
-        elif self.yut_rst == 2:
-            self.move_meeple_sec(2, self.order[self.order_idx].meeples[1])
-            self.order_idx += 1
-        elif self.yut_rst == 3:
-            self.move_meeple_sec(3, self.order[self.order_idx].meeples[1])
-            self.order_idx += 1
-        elif self.yut_rst == 4:
-            self.move_meeple_sec(4, self.order[self.order_idx].meeples[1])
-        elif self.yut_rst == 0:
-            self.move_meeple_sec(5, self.order[self.order_idx].meeples[1])
+    # 가능한 arrow 모두 표시
+    def show_arrow(self):
+        for arrow in self.arrow:
+            if arrow.state:
+                self.screen.blit(arrow.image, (arrow.x_pos, arrow.y_pos))
 
+    # 한번 더 할지 결정
+    def process5(self, player):
+        idx = self.order.index(player)
+        # who_this = 이동한 다음 자기(idx)가 올라간 위치.
+        who_this = self.yut_board.board_state[player.meeples[player.idx].pos][0]
+        this_meeple = self.yut_board.board_state[player.meeples[player.idx].pos][0]
+        # 말들이 겹쳐질 때
+        if who_this != -1:
+            # 업을 수 있는 경우
+            if who_this == idx:
+                self.order[who_this].meeples[this_meeple].state = 3
+                self.order[who_this].meeples[this_meeple].pos = 0
+                player.meeples[player.idx].carry_my_back()
+                player.meeples[this_meeple].carry_my_back()
+                # 턴 넘김
+                self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
+                self.yut_board.board_state[player.meeples[player.idx].pos][1] = player.idx
+                return "finish"
+            # 잡을 수 있는 경우
+            else:
+                # 잡힌 게임 말의 상태와 위치는 0
+                self.order[who_this].meeples[this_meeple].state = 0
+                self.order[who_this].meeples[this_meeple].pos = 0
+                # 업혀져 있는 게임 말들도 모두 0으로
+                for meeple in self.order[who_this].meeples:
+                    if meeple.state == 3:
+                        self.order[who_this].meeples[this_meeple].state = 0
+        # 말들이 겹치지 않았을 때
+        else:
+            # 윷이나 모가 안 나오면 턴 넘김
+            if 0 < self.yut_rst < 4:
+                self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
+                self.yut_board.board_state[player.meeples[player.idx].pos][1] = player.idx
+                return "finish"
 
-if __name__ == "__main__":
-    test = YutGame()
-    print(test.computer_list)
+        self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
+        self.yut_board.board_state[player.meeples[player.idx].pos][1] = player.idx
+        self.is_gp5 = False
+        self.is_gp1 = True
+
+        # 사용자 이벤트
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.screen_game = False
+                self.screen_ending = True
+                self.is_gp5 = False
+
