@@ -41,8 +41,12 @@ class Player:
     # 남은 말의 개수가 없으면 True
     def check_done(self):
         for meeple in self.meeples:
-            print("게임말의 상태: ", meeple.state)
+            #print("게임말의 상태: ", meeple.state)
             if meeple.state != 2:
                 return False
         print("True 리턴")
         return True
+
+    # 잡히면 집으로 돌려보냄
+    def go_home(self):
+        pass

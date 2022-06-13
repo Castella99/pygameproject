@@ -329,7 +329,7 @@ class YutGame(Prototype):
         self.text_blit(victory_text, (0, 0, 0), 540, 100)
         no_winner = True
         for i in self.order:
-            if int(self.winner[6]) == self.order.index(i):
+            if i.state == 1:
                 self.screen.blit(i.meeples[0].image,(720, 70))
                 no_winner = False
         if no_winner:
@@ -395,8 +395,12 @@ class YutGame(Prototype):
     def game_process(self, player):
         #승패가 결정됨.
         if player.check_done():
+            if player.state != 0:
+                print("이미 순위가 결정됨.")
+                return True
             player.state = Player.Player.score
             Player.Player.score += 1
+            print("순위를 매김", str(player.state)+"등, 다음은", Player.Player.score)
             return True
         # 아직 남음
         else:
@@ -408,6 +412,7 @@ class YutGame(Prototype):
                 self.process3(player)
             elif self.is_gp4:
                 if self.process4(player) == "finish":
+                    self.print_all_state()
                     return True
             elif self.is_gp5:
                 prompt = self.process5(player)
@@ -678,7 +683,8 @@ class YutGame(Prototype):
         # 윷을 던진 결과를 보드에 적용
         self.move_meeple(player)
         self.is_gp4 = False
-        self.is_gp5 = True
+        self.is_gp1 = True
+        return "finish"
 
         # 사용자 이벤트
         for event in pygame.event.get():
@@ -734,6 +740,7 @@ class YutGame(Prototype):
             print("완주해서 턴 넘김.")
             self.is_gp5 = False
             self.is_gp1 = True
+            self.print_all_state()
             return "finish"
         self.board_screen_blit(player)
         idx = self.order.index(player)
@@ -743,12 +750,12 @@ class YutGame(Prototype):
         print(who_this, this_meeple)
         # 말들이 겹쳐질 때
         if who_this != -1:
-
             print("말 겹침")
             # 업을 수 있는 경우
             if who_this == idx and player.meeples[this_meeple].pos != 31:
                 print("그래서 업음.")
                 self.order[who_this].meeples[this_meeple].state = 3
+                self.order[who_this].meeples[this_meeple].pos = 0
                 player.meeples[player.idx].carry_my_back()
                 # 턴 넘김
                 self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
@@ -756,6 +763,7 @@ class YutGame(Prototype):
                 print("움직이고 난 후:", self.yut_board.board_state)
                 self.is_gp5 = False
                 self.is_gp1 = True
+                self.print_all_state()
                 return "finish"
             # 잡을 수 있는 경우
             else:
@@ -781,6 +789,7 @@ class YutGame(Prototype):
                 print("움직이고 난 후:", self.yut_board.board_state)
                 self.is_gp5 = False
                 self.is_gp1 = True
+                self.print_all_state()
                 return "finish"
             print("윷 모 나옴")
         self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
@@ -788,6 +797,7 @@ class YutGame(Prototype):
         self.is_gp5 = False
         self.is_gp1 = True
         print("움직이고 난 후:",self.yut_board.board_state)
+        self.print_all_state()
 
         # 사용자 이벤트
         for event in pygame.event.get():
@@ -795,6 +805,13 @@ class YutGame(Prototype):
                 self.screen_game = False
                 self.screen_ending = True
                 self.is_gp5 = False
+    # 버그 수정에 사용 정신나갈거 같아~~
+    def print_all_state(self):
+        for i, player  in enumerate(self.order):
+            print(str(i+1)+"번째 player:", player.state,end=", ")
+            for j, meeple in enumerate(player.meeples):
+                print(str(j+1)+"번째 말:",meeple.state,"-",meeple.pos, end=", ")
+            print()
 
 if __name__ == "__main__":
     pass

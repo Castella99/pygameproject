@@ -39,6 +39,7 @@ class Meeple:
         self.sum = sum  # (업은 수)
         self.pos = pos  # 내가 현재 위치하는 칸
         self.state = state  # 0=아직, 1=보드위, 2=통과, 3=업힘
+        self.who_back = -1 # 몇번째 idx meeple에게 업혀있는지
 
         self.image = self.mipple_images[color][self.sum]
         self.size = self.image.get_rect().size
