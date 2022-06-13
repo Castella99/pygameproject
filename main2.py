@@ -7,6 +7,7 @@ while True:
     game = YutGame2.YutGame()
     # 게임 파트를 4개로 나눔(시작과 도움말, 초기 설정, 보드판과 윷판, 엔딩 화면)
     # 시작 부분
+    pygame.mixer.stop()
     game.sound_start.play()
     while game.screen_title:
         game.show_title_screen()  # 시작부분 이벤트와 화면그리기 (게임 초기 설정 추가 예정)
@@ -57,13 +58,15 @@ while True:
     # 버그잡을 때 사용; 전체 순위를 콘솔 창으로 한번 봄.
     for p in game.order:
         print("player"+ str(game.order.index(p)+1) +"은", p.state, "등")
+
+    pygame.mixer.stop()
+    game.sound_end.play()
     # 끝 부분
     while game.screen_ending:
         game.show_ending_screen()  # 끝 부분 이벤트와 화면그리기 (승자 패자 화면 출력 추가 예정)
         pygame.display.update()
     if not game.running:
         break
-    game.sound_again.play()
     del game
     # 순위 정하는 클래스 변수 다시 초기화
     Player.Player.score = 1

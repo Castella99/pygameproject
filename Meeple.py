@@ -70,7 +70,7 @@ class Meeple:
             self.state = 2
             self.pos = 31
             return
-        self.move_sound[Meeple.sound_idx].play()
+        #self.move_sound[Meeple.sound_idx].play()
         Meeple.sound_idx += 1
         if arrow == 0:
             self.pos += 1

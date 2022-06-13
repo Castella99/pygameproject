@@ -23,9 +23,9 @@ class YutGame(Prototype):
         self.push = False
 
         # 효과음
-        self.sound_yut = pygame.mixer.Sound(self.path + "/sound/yut.mp3")
-        self.sound_start = pygame.mixer.Sound(self.path + "/sound/startBGM.mp3")
-        self.sound_again = pygame.mixer.Sound(self.path + "/sound/again.mp3")
+        self.sound_yut = pygame.mixer.Sound(self.path + "/sound/yut.wav")
+        self.sound_start = pygame.mixer.Sound(self.path + "/sound/start1.mp3")
+        self.sound_end = pygame.mixer.Sound(self.path + "/sound/end.wav")
 
         # 세팅에 필요한 변수들
         self.player_text = None
@@ -338,6 +338,7 @@ class YutGame(Prototype):
 
     # player 순서를 랜덤으로 정함.
     def set_order(self):
+        self.sound_start.set_volume(0.5)
         # 컴퓨터 리스트의 길이와 플레이어 리스트의 길이의 합이 0 아니면
         while len(self.computer_list)+len(self.player_list) != 0:
             i = random.randrange(2)
