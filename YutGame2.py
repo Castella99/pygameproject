@@ -22,6 +22,11 @@ class YutGame(Prototype):
         self.running = True
         self.push = False
 
+        # 효과음
+        self.sound_yut = pygame.mixer.Sound(self.path + "/sound/yut.mp3")
+        self.sound_start = pygame.mixer.Sound(self.path + "/sound/startBGM.mp3")
+        self.sound_again = pygame.mixer.Sound(self.path + "/sound/again.mp3")
+
         # 세팅에 필요한 변수들
         self.player_text = None
         self.computer_text = None
@@ -527,6 +532,7 @@ class YutGame(Prototype):
 
     # 윷을 던지고 난 후 애니메이션
     def main_delay(self, sec, player):
+        self.sound_yut.play()
         temp_ticks = pygame.time.get_ticks()
         while pygame.time.get_ticks() - temp_ticks <= sec*1000:
             self.screen.blit(self.background.put_image("table"), (0, 0))
@@ -694,6 +700,7 @@ class YutGame(Prototype):
 
     # 화면상에서 말 움직이기 함수; 윷의 결과만큼 이동시킴. + 업기 잡기 결정
     def move_meeple(self, player):
+
         # 현재 자기가 있는 칸은 -1로 바꿈
         print("움직이기 전:", self.yut_board.board_state)
         print("윷의 결과:",self.yut_rst)
@@ -711,6 +718,7 @@ class YutGame(Prototype):
             self.move_meeple_sec(4, self.order[idx].meeples[player.idx], player)
         elif self.yut_rst == 0:
             self.move_meeple_sec(5, self.order[idx].meeples[player.idx], player)
+        Meeple.Meeple.sound_idx = 0
 
     # 한 칸씩 움직이기; player의 움직일 meeple을 move만큼 이동시킴.
     def move_meeple_sec(self, move, mee, player):
@@ -736,6 +744,7 @@ class YutGame(Prototype):
                 player.update_state("pass", player.idx)
                 ##################################
                 break
+
 
     # 선택한 arrow가 무엇인지 확인
     def check_arrow(self):

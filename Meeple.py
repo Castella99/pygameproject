@@ -8,7 +8,7 @@ from gameBoard import board_map
 # 게임 말 객체 (다음 칸으로 이동하기, 업기 메소드 포함)
 class Meeple:
     path = os.path.dirname(os.path.abspath(__file__))
-
+    sound_idx = 0
     # 게임말 종류 6가지: 빨강, 주황, 노랑, 초록, 파랑, 보라
     # 기본은 1이고 업을 때마다 2, 3으로 갱신 (업기 2개까지)
     mipple_images = {
@@ -31,7 +31,7 @@ class Meeple:
                    pygame.image.load(path + "/meeple/mipple purple2.png"),
                    pygame.image.load(path + "/meeple/mipple purple3.png")],
         "void": [pygame.image.load(path + "/meeple/void.png"),
-                 pygame.image.load(path + "/meeple/void2.png"),]
+                 pygame.image.load(path + "/meeple/void2.png")]
     }
 
     def __init__(self, color="red", pos=0, state=0, sum=0):
@@ -41,6 +41,16 @@ class Meeple:
         self.state = state  # 0=아직, 1=보드위, 2=통과, 3=업힘
         self.who_back = -1 # 몇번째 idx meeple에게 업혀있는지
         # -1: 업혀있지 않음, 0: 0번째 말에게 업힘, 1: 1번째 말에게 업힘, 2: 2번째 말에게 업힘.
+
+        # 효과음들
+        self.move_sound = [
+            pygame.mixer.Sound(self.path + "/sound/a.wav"),
+            pygame.mixer.Sound(self.path + "/sound/b.wav"),
+            pygame.mixer.Sound(self.path + "/sound/c.wav"),
+            pygame.mixer.Sound(self.path + "/sound/d.wav"),
+            pygame.mixer.Sound(self.path + "/sound/e.wav")
+        ]
+
 
         self.image = self.mipple_images[color][self.sum]
         self.size = self.image.get_rect().size
@@ -60,7 +70,8 @@ class Meeple:
             self.state = 2
             self.pos = 31
             return
-
+        self.move_sound[Meeple.sound_idx].play()
+        Meeple.sound_idx += 1
         if arrow == 0:
             self.pos += 1
         elif arrow == 1:
@@ -123,6 +134,7 @@ class Meeple:
         self.x_pos = board_map[self.pos][0] - (self.width / 2)
         self.y_pos = board_map[self.pos][1] - (self.height / 2)
         self.state = 1
+
 
     # sum에 맞게 이미지를 변경한다.
     # 기본은 0, 하나 업으면 1, 두개 업으면 2
