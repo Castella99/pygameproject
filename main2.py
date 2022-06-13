@@ -22,6 +22,7 @@ while True:
         pygame.display.update()
 
     # 게임 중
+    is_finish = 0
     game.set_order()  # 게임 순서 정하기
     while game.screen_game:
         is_finish = 0
@@ -48,15 +49,21 @@ while True:
             game.screen_ending = True
             game.screen_game = False
 
-    # 끝 부분
+    # 최후의 1인인 경우(강제 종료 당함) 마지막 순위를 매겨줌.
+    for p in game.order:
+        if p.state == 0 and is_finish == len(game.order)-1 and len(game.order) != 1:
+            p.state = Player.Player.score
+    # 버그잡을 때 사용; 전체 순위를 콘솔 창으로 한번 봄.
     for p in game.order:
         print("player"+ str(game.order.index(p)+1) +"은", p.state, "등")
+    # 끝 부분
     while game.screen_ending:
         game.show_ending_screen()  # 끝 부분 이벤트와 화면그리기 (승자 패자 화면 출력 추가 예정)
         pygame.display.update()
     if not game.running:
         break
     del game
-    Player.Player.score = 0
+    # 순위 정하는 클래스 변수 다시 초기화
+    Player.Player.score = 1
 pygame.quit()
 

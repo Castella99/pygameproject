@@ -40,6 +40,7 @@ class Meeple:
         self.pos = pos  # 내가 현재 위치하는 칸
         self.state = state  # 0=아직, 1=보드위, 2=통과, 3=업힘
         self.who_back = -1 # 몇번째 idx meeple에게 업혀있는지
+        # -1: 업혀있지 않음, 0: 0번째 말에게 업힘, 1: 1번째 말에게 업힘, 2: 2번째 말에게 업힘.
 
         self.image = self.mipple_images[color][self.sum]
         self.size = self.image.get_rect().size
@@ -55,8 +56,9 @@ class Meeple:
     # ex) 도이면 num=1, 윷이면 num=4
     def move(self, arrow):
         # 게임 말이 보드판을 완주하면
-        if self.state == 2 or self.pos >= len(gameBoard.board_map)-2:
+        if self.state == 2 or self.pos == 31:
             self.state = 2
+            self.pos = 31
             return
 
         if arrow == 0:
@@ -122,10 +124,10 @@ class Meeple:
         self.y_pos = board_map[self.pos][1] - (self.height / 2)
         self.state = 1
 
-    # 다른 말 업기 (이미지 변경)
-    # 기본은 1, 하나 업으면 2, 두개 업으면 3
-    def carry_my_back(self):
-        self.sum += 1
+    # sum에 맞게 이미지를 변경한다.
+    # 기본은 0, 하나 업으면 1, 두개 업으면 2
+    def change_sum_and_image(self, sum):
+        self.sum = sum
         self.image = self.mipple_images[self.color][self.sum]
 
     # 게임말 선택 화면에서 사용함.

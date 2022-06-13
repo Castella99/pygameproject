@@ -83,7 +83,6 @@ class YutGame(Prototype):
         # 윷과 윷판 객체
         self.yut = Yut.Yut("front", 1)
         self.yut_board = gameBoard.GameBoard()
-
         self.animation_time = round(100 / len(self.yut.yut_images * 100), 2)
 
         # 각종 버튼 객체
@@ -111,11 +110,8 @@ class YutGame(Prototype):
             Arrow.Arrow("rightup", Arrow.arrow_map[24]), Arrow.Arrow("leftup", Arrow.arrow_map[26]),
             Arrow.Arrow("rightdown", Arrow.arrow_map[28]), Arrow.Arrow("leftdown", Arrow.arrow_map[23])
         ]
-
         for color in self.meeple_color_list:
             self.meeple_button_list.append(Meeple.Meeple(color, 0, 0, 0))
-
-
 
     def __del__(self):
         print("게임이 제거 되었습니다.")
@@ -417,6 +413,7 @@ class YutGame(Prototype):
             elif self.is_gp5:
                 prompt = self.process5(player)
                 if prompt == "finish":
+                    self.print_all_state()
                     return True
             pygame.display.update()
 
@@ -683,8 +680,10 @@ class YutGame(Prototype):
         # 윷을 던진 결과를 보드에 적용
         self.move_meeple(player)
         self.is_gp4 = False
-        self.is_gp1 = True
-        return "finish"
+        self.is_gp5 = True
+        # 아래 코드는 process5 안할 때 사용(업기, 잡기, 한번더 생각 안할 때)
+        #self.is_gp1 = True
+        #return "finish"
 
         # 사용자 이벤트
         for event in pygame.event.get():
@@ -723,7 +722,19 @@ class YutGame(Prototype):
                     self.text_blit("컴퓨터가 하는 중...", Computer.Computer.color_list[player.color], 180, 40)
                 pygame.display.update()
             mee.move(self.check_arrow())
+            # 위 move()함수에서 state이 제대로 설정이 안되는 경우가 존재
+            # (혹시 모르니) 내가 완주하면 state = 2로 바꿔줌.
+            if mee.pos == 31:
+                mee.state = 2
+                mee.pos = 31
+                mee.change_sum_and_image(0)
+                mee.who_back = -1
+            # 완주하면 더 이상 움직이지 않음. (pos 31에서 안 움직임.)
             if mee.state == 2:
+                # 이 게임말이 완주했으니 업혀있는 게임말들도 완주(2)로 상태 업데이트함.
+                my_idx = player.meeples.index(mee)
+                player.update_state("pass", player.idx)
+                ##################################
                 break
 
     # 선택한 arrow가 무엇인지 확인
@@ -735,82 +746,63 @@ class YutGame(Prototype):
 
         # 한번 더 할지 결정
     def process5(self, player):
-        # 만약에 완주했으면 바로 턴 넘김.
-        if player.check_done():
-            print("완주해서 턴 넘김.")
-            self.is_gp5 = False
-            self.is_gp1 = True
-            self.print_all_state()
-            return "finish"
-        self.board_screen_blit(player)
-        idx = self.order.index(player)
-        # who_this = 이동한 다음 자기(idx)가 올라간 위치.
-        who_this = self.yut_board.board_state[player.meeples[player.idx].pos][0]
-        this_meeple = self.yut_board.board_state[player.meeples[player.idx].pos][1]
-        print(who_this, this_meeple)
-        # 말들이 겹쳐질 때
-        if who_this != -1:
-            print("말 겹침")
-            # 업을 수 있는 경우
-            if who_this == idx and player.meeples[this_meeple].pos != 31:
-                print("그래서 업음.")
-                self.order[who_this].meeples[this_meeple].state = 3
-                self.order[who_this].meeples[this_meeple].pos = 0
-                player.meeples[player.idx].carry_my_back()
-                # 턴 넘김
-                self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
+        #나의 idx
+        my_idx = self.order.index(player)
+        my_meeple = player.idx
+        # 내가 이동한 칸의 있는 player idx와 meeple number를 불러옴.
+        who_idx = self.yut_board.board_state[player.meeples[player.idx].pos][0]
+        meeple_idx = self.yut_board.board_state[player.meeples[player.idx].pos][1]
+        if who_idx == -1:
+            print("아무도 없네 ㅎㅎ")
+            # 근데 만약 윷이나 모가 나오면 한번 더함.
+            if 0 == self.yut_rst or self.yut_rst == 4:
+                print("윷 모 나와서 한 번 더함. ㄱㅇㄷ")
+                # 이 칸(위치)에 자기가 있다고 알려줌
+                self.yut_board.board_state[player.meeples[player.idx].pos][0] = my_idx
                 self.yut_board.board_state[player.meeples[player.idx].pos][1] = player.idx
-                print("움직이고 난 후:", self.yut_board.board_state)
                 self.is_gp5 = False
                 self.is_gp1 = True
-                self.print_all_state()
-                return "finish"
-            # 잡을 수 있는 경우
-            else:
-                print("그래서 잡음")
-                # 잡힌 게임 말의 상태와 위치는 0
-                self.order[who_this].meeples[this_meeple].state = 0
-                self.order[who_this].meeples[this_meeple].pos = 0
-                # 업혀져 있는 게임 말들도 모두 0으로
-                for meeple in self.order[who_this].meeples:
-                    if meeple.state == 2:
-                        continue
-                    if meeple.state == 3:
-                        self.order[who_this].meeples[this_meeple].state = 0
-                        self.order[who_this].meeples[this_meeple].pos = 0
-        # 말들이 겹치지 않았을 때
-        else:
-            print("말 안겹침")
-            # 윷이나 모가 안 나오면 턴 넘김
-            if 0 < self.yut_rst < 4:
-                print("윷, 모 안 나옴")
-                self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
+                return
+        # 누군가의 말이 있는데 그 말 상태가 1(보드 위)일때만
+        elif who_idx != -1 and self.order[who_idx].meeples[meeple_idx].state == 1:
+            print("누군가 있음.")
+            # 일단 칸에서 없애버림, 위치도 0으로 바꿈
+            self.order[who_idx].meeples[meeple_idx].state = 0
+            self.order[who_idx].meeples[meeple_idx].pos = 0
+            #만약에 이게 다른 player의 말이었으면 한번 더 함.
+            if who_idx != my_idx:
+                print("잡아서 한 번 더함. ㄱㅇㄷ")
+                # 잡힌 녀셕의 이미지도 초기화
+                self.order[who_idx].meeples[meeple_idx].change_sum_and_image(0)
+                # 잡힌 녀석(meeple_idx)에게 업혀있는 녀석들의 상태도 업데이트함.
+                self.order[who_idx].update_state("die", meeple_idx)
+                ###################################################
+                # 이 칸(위치)에 자기가 있다고 알려줌
+                self.yut_board.board_state[player.meeples[player.idx].pos][0] = my_idx
                 self.yut_board.board_state[player.meeples[player.idx].pos][1] = player.idx
-                print("움직이고 난 후:", self.yut_board.board_state)
                 self.is_gp5 = False
                 self.is_gp1 = True
-                self.print_all_state()
-                return "finish"
-            print("윷 모 나옴")
-        self.yut_board.board_state[player.meeples[player.idx].pos][0] = idx
+                return
+            # 이게 나의 말이면 업기하고 턴 넘김.
+            elif who_idx == my_idx:
+                print("내 게임 말이어서 업음.")
+                # 잡힌 말의 who_back을 my_idx(자신의 말)로 바꿈.
+                self.order[who_idx].update_state("combine", my_meeple, meeple_idx)
+                ##################################################
+        # 이 칸(위치)에 자기가 있다고 알려줌
+        self.yut_board.board_state[player.meeples[player.idx].pos][0] = my_idx
         self.yut_board.board_state[player.meeples[player.idx].pos][1] = player.idx
+        # 턴 넘김
         self.is_gp5 = False
         self.is_gp1 = True
-        print("움직이고 난 후:",self.yut_board.board_state)
-        self.print_all_state()
+        return "finish"
 
-        # 사용자 이벤트
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.screen_game = False
-                self.screen_ending = True
-                self.is_gp5 = False
     # 버그 수정에 사용 정신나갈거 같아~~
     def print_all_state(self):
         for i, player  in enumerate(self.order):
-            print(str(i+1)+"번째 player:", player.state,end=", ")
+            print(str(i+1)+"번째 player("+str(player.state)+")의 idx:",player.idx,end=", ")
             for j, meeple in enumerate(player.meeples):
-                print(str(j+1)+"번째 말:",meeple.state,"-",meeple.pos, end=", ")
+                print(str(j+1)+"번째 말:",meeple.state,"-",meeple.pos,"-",meeple.who_back, end=", ")
             print()
 
 if __name__ == "__main__":
